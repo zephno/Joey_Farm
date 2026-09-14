@@ -176,13 +176,9 @@ body {
   padding: 60px 0 30px;
 }
 
-.page-footer h6 {
-  color: #e69500;
-  font-weight: 700;
-}
-
 .page-footer p {
   color: #d9cdbf;
+  white-space: pre-line;
 }
 
 .footer-copyright {
