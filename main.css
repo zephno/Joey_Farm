@@ -52,7 +52,7 @@ body {
   min-width: 100%;
   left: 0;
   top: 0;
-  background: rgba(138, 100, 2, 0.25);
+  background: rgba(244, 176, 3, 0.209);
   z-index: 5;
   pointer-events: none;
 }
