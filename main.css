@@ -52,7 +52,7 @@ body {
   min-width: 100%;
   left: 0;
   top: 0;
-  background: rgba(138, 100, 2, 0.25);
+  background: rgba(233, 170, 10, 0.25);
   z-index: 5;
   pointer-events: none;
 }
@@ -94,7 +94,14 @@ body {
   position: relative;
   background-color: #eae1d2;
   border-radius: 8px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+#formDesign{
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.21);
+}
+
+#eggServices {
+  background-color: #f4efe6;
 }
 
 .features img {
