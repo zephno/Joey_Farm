@@ -52,7 +52,7 @@ body {
   min-width: 100%;
   left: 0;
   top: 0;
-  background: rgba(244, 176, 3, 0.209);
+  background: rgba(138, 100, 2, 0.25);
   z-index: 5;
   pointer-events: none;
 }
@@ -69,7 +69,7 @@ body {
 }
 
 .description img {
-  max-width: 600px;
+  max-width: 380px;
   width: 100%;
   height: auto;
   display: inline-block;
@@ -212,4 +212,96 @@ body {
     margin-top: 0.5em;
     display: inline-block;
   }
+}
+.modal-content {
+  background-color: #f4efe6;
+  border: 1px solid #37261a;
+  border-radius: 8px;
+  color: #2b1e16;
+}
+
+.modal-header {
+  background-color: #4a3525;
+  color: #fcf8ee;
+  border-bottom: 1px solid #37261a;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+.modal-header .close {
+  color: #fcf8ee;
+  opacity: 0.8;
+  text-shadow: none;
+}
+
+.modal-header .close:hover {
+  color: #e69500;
+  opacity: 1;
+}
+
+.modal-title {
+  font-weight: 700;
+  color: #fcf8ee;
+}
+
+.modal-body label {
+  font-weight: 600;
+  color: #4a3525;
+}
+
+.modal-body .form-control {
+  border: 1px solid #b8a695;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.modal-body .form-control:focus {
+  border-color: #e69500;
+  box-shadow: 0 0 0 0.2rem rgba(230, 149, 0, 0.25);
+}
+
+.modal-body .btn-primary {
+  background-color: #e69500;
+  border-color: #e69500;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-body .btn-primary:hover,
+.modal-body .btn-primary:focus {
+  background-color: #cc8400;
+  border-color: #cc8400;
+  color: #ffffff;
+}
+
+.modal-footer {
+  background-color: #eae1d2;
+  border-top: 1px solid #b8a695;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+}
+
+.modal-footer a {
+  color: #2e5016;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.modal-footer a:hover {
+  color: #e69500;
+  text-decoration: underline;
+}
+
+.description button {
+  border:1px solid #000000;
+  background:#e69500;
+  border-radius: 4;
+  color:#f1f1f1;
+
+}
+.description button:hover { 
+  border:1px solid #fff;
+  background:#fff;
+  color:#000;
 }
