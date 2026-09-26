@@ -14,4 +14,13 @@ $(document).ready(function(){
 
     $(this).trigger('reset');
   });
+
+  $(window).scroll(function() {
+    if ($(window).scrollTop() >= 56) {
+      $('.navbar').addClass('navbar-scrolled');
+    } else {
+      $('.navbar').removeClass('navbar-scrolled');
+    }
+  });
 });
+

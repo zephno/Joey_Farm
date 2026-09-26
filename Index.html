@@ -9,17 +9,17 @@
   </head>
 
 <body>
-    <nav class="navbar navbar-expand-md sticky-top">
+    <nav class="navbar navbar-expand-md fixed-top">
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="main-navigation">
           <ul class="navbar-nav align-items-center">
             <li class="nav-item">
-              <a class="nav-link" href="#">Home</a>
+              <a class="nav-link nav-outline-text" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
+              <a class="nav-link nav-outline-text" href="#">About</a>
             </li>
             <li class="nav-item">
               <a class="btn nav-login-btn" href="#" data-toggle="modal" data-target="#loginModal">Login</a>
@@ -29,15 +29,15 @@
     </nav>
 
 <header class="page-header container-fluid">
-        <div class="overlay"></div>
-        <div class="description">
-            <img src="images/logo.png" alt="Joey's Farm Logo" class="img-fluid">
-            <div class="b">
-                <button class="btn btn-outline-secondary btn-lg mt-3" data-toggle="modal" data-target="#loginModal">
+  <div class="overlay"></div>
+  <div class="description">
+    <img src="images/logo.png" alt="Joey's Farm Logo" class="img-fluid">
+    <div class="b">
+      <button class="btn btn-outline-secondary btn-lg mt-3" data-toggle="modal" data-target="#loginModal">
         Order Now
-    </button>
-</div> 
-        </div>
+      </button>
+    </div> 
+  </div>
 
         <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="3000">
             <ol class="carousel-indicators">
@@ -69,27 +69,51 @@
 
 <div class="container features" id="eggServices">
   <div class="row">
-    <div class="col-lg-4 col-md-4 col-sm-12">
-      <div class="feature-title">Delivery/Pick-up Services</div>
-      <img src="images/delivery.jpg" alt="delivery" class="img-fluid">
-      <p>Get farm-fresh eggs delivered straight to your doorstep or schedule a convenient pickup at our local farm stand. Every order is packed with care on the day of collection to guarantee maximum freshness.</p>
+    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+      <div class="card h-100 border-0 bg-transparent">
+        <div class="bg-white rounded-circle p-3 text-center d-flex align-items-center justify-content-center" style="height: 180px;">
+          <img src="images/delivery.jpg" alt="delivery" class="mw-100 mh-100">
+        </div> 
+        <div class="card-body px-0 text-center">
+          <div class="feature-title font-weight-bold text-uppercase mb-1">Delivery/Pick-up Services</div>
+          <p class="card-text text-muted">
+            Get farm-fresh eggs delivered straight to your doorstep or schedule a convenient pickup at our local farm stand. Every order is packed with care on the day of collection to guarantee maximum freshness.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div class="col-lg-4 col-md-4 col-sm-12">
-      <div class="feature-title">Organic, Fresh, and Ethically Sourced Eggs</div>
-      <img src="images/roaming.jpg" alt="Chicken Egg" class="img-fluid">
-      <p>Our pasture-raised hens enjoy sunshine, clean air, and a 100% natural, organic diet. The result is nutrient-dense, rich-tasting eggs with deep golden yolks produced through sustainable farming practices.</p>
+    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+      <div class="card h-100 border-0 bg-transparent">
+        <div class="bg-white rounded-circle p-3 text-center d-flex align-items-center justify-content-center" style="height: 180px;">
+          <img src="images/roaming.jpg" alt="Chicken Egg" class="mw-100 mh-100">
+        </div> 
+        <div class="card-body px-0 text-center">
+          <div class="feature-title font-weight-bold text-uppercase mb-1">Organic, Fresh, and Ethically Sourced Eggs</div>
+          <p class="card-text text-muted">
+            Our pasture-raised hens enjoy sunshine, clean air, and a 100% natural, organic diet. The result is nutrient-dense, rich-tasting eggs with deep golden yolks produced through sustainable farming practices.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div class="col-lg-4 col-md-4 col-sm-12">
-      <div class="feature-title">Ease of Ordering</div>
-      <img src="images/easy.jpg" alt="Order" class="img-fluid">
-      <p>Place your orders effortlessly through our online portal. Just a few clicks to keep your kitchen stocked with wholesome ingredients.</p>
+    <div class="col-lg-4 col-md-4 col-sm-12 mb-4">
+      <div class="card h-100 border-0 bg-transparent">
+        <div class="bg-white rounded-circle p-3 text-center d-flex align-items-center justify-content-center" style="height: 180px;">
+          <img src="images/easy.jpg" alt="Order" class="mw-100 mh-100">
+        </div> 
+        <div class="card-body px-0 text-center">
+          <div class="feature-title font-weight-bold text-uppercase mb-1">Ease of Ordering</div>
+          <p class="card-text text-muted">
+            Place your orders effortlessly through our online portal. Just a few clicks to keep your kitchen stocked with wholesome ingredients.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-  <div class="container features" id="formDesign">
+  <div class="container features bg-white" id="formDesign">
     <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">    
       <div class="feature-title">Get in Touch!</div>
       <div class="form-group">
