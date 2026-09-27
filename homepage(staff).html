@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joey's Farm | Staff Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <a class="navbar-brand" href="homepage(staff).html" aria-label="Joey's Farm home">
+            <span class="logo-badge">
+                <img src="images/logo.png" alt="Joey's Farm logo" class="logo-img">
+            </span>
+            <span class="d-none d-sm-inline">Joey's Farm</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#staffNavigation" aria-controls="staffNavigation"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="staffNavigation">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="homepage(staff).html" aria-current="page">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="staff.html#inventory-section">Inventory</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="staff.html#orders-section">Orders</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container-fluid px-3 px-md-4 py-4">
+        <section class="main-container rounded" aria-labelledby="order-history-heading">
+            <h1 id="order-history-heading" class="section-title mb-4">
+                Recent order history
+            </h1>
+
+            <div class="table-responsive">
+                <table id="recent-orders-table" class="table wireframe-table mb-0">
+                    <caption class="sr-only">Most recent order history</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Order details</th>
+                            <th scope="col">Receipt no.</th>
+                            <th scope="col">Amount to be paid</th>
+                            <th scope="col">Delivery date</th>
+                            <th scope="col">Delivery status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="orders-loading-row">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Loading recent orders. Please wait.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="homepage(staff).js"></script>
+</body>
+</html>
