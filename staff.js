@@ -1,41 +1,41 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
 
     function refreshRecentOrders() {
         const recentOrders = [
             {
-                details: '5 Trays Large Eggs',
+                details: '5 Trays (36 Eggs/Tray) • 180 Eggs Total - Large',
                 receipt: 'REC-2026-001',
-                amount: '₱ 1,100',
+                amount: '₱ 1,550.00',
                 date: '2026-09-28',
                 status: 'Pending'
             },
             {
-                details: '10 Trays Medium Eggs',
+                details: '10 Trays (24 Eggs/Tray) • 240 Eggs Total - Medium',
                 receipt: 'REC-2026-002',
-                amount: '₱ 2,000',
+                amount: '₱ 1,950.00',
                 date: '2026-09-29',
                 status: 'Pending'
             },
             {
-                details: '3 Trays XL Eggs',
+                details: '3 Trays (12 Eggs/Tray) • 36 Eggs Total - Extra Large',
                 receipt: 'REC-2026-000',
-                amount: '₱ 750',
+                amount: '₱ 327.00',
                 date: '2026-09-27',
                 status: 'Confirmed'
             }
         ];
 
-        const $tbody = $('#recent-orders-table tbody');
+        const $tbody =$('#recent-orders-table tbody');
         $tbody.empty();
 
         recentOrders.forEach(function (order) {
-            const $row = $('<tr>');
+            const $row =$('<tr>');
             $row.append($('<td>').addClass('details').text(order.details));
             $row.append($('<td>').addClass('receipt').text(order.receipt));
             $row.append($('<td>').addClass('amount').text(order.amount));
             $row.append($('<td>').addClass('date').text(order.date));
 
-            const $statusCell = $('<td>');
+            const $statusCell =$('<td>');
             if (order.status === 'Confirmed') {
                 $statusCell.append($('<span>').addClass('badge badge-info px-3 py-2').text('Confirmed'));
             } else {
@@ -43,7 +43,7 @@
             }
             $row.append($statusCell);
 
-            const $actionCell = $('<td>');
+            const $actionCell =$('<td>');
             if (order.status === 'Pending') {
                 $actionCell.append($('<button>').addClass('btn-pill-action btn-confirm-order').text('confirm'));
             } else {
@@ -57,12 +57,10 @@
 
     $('.nav-link').on('click', function (e) {
         e.preventDefault();
-        $('.nav-link').removeClass('active');
-        $(this).addClass('active');
+        $('.nav-link').removeClass('active');$(this).addClass('active');
 
         const target = $(this).data('target');
-        $('.tab-content-page').removeClass('active');
-        $('#' + target).addClass('active');
+        $('.tab-content-page').removeClass('active');$('#' + target).addClass('active');
 
         if (target === 'home-section') {
             refreshRecentOrders();
@@ -76,21 +74,32 @@
 
     function updateInventoryTotals() {
         $('#inventory-table tbody tr').each(function () {
+            const $traySelect =$(this).find('.tray-select');
+            const traySize = parseInt($traySelect.val(), 10) || 36;
+            const pricePerTray = parseFloat($traySelect.find(':selected').data('price')) || 0;
+
+            // Update Price per Tray input display
+            $(this).find('.price-display').val(`₱ ${pricePerTray.toFixed(2)}`);
+
             const fresh = parseInt($(this).find('.fresh-qty').val(), 10) || 0;
             const expiry = parseInt($(this).find('.expiry-qty').val(), 10) || 0;
             const broken = parseInt($(this).find('.broken-qty').val(), 10) || 0;
 
-            const total = fresh + expiry + broken;
-            $(this).find('.total-calc').val(total);
+            const totalTrays = fresh + expiry + broken;
+            const totalEggs = totalTrays * traySize;
+            const totalVal = totalTrays * pricePerTray;
+
+            $(this).find('.total-trays').val(totalTrays);
+            $(this).find('.total-eggs').val(totalEggs);$(this).find('.total-value').val(`₱ ${totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
         });
     }
 
-    $(document).on('input change', '.fresh-qty, .expiry-qty, .broken-qty', function () {
+    $(document).on('input change', '.fresh-qty, .expiry-qty, .broken-qty, .tray-select', function () {
         updateInventoryTotals();
     });
 
     $(document).on('click', '.btn-confirm-order', function () {
-        const $row = $(this).closest('tr');
+        const $row =$(this).closest('tr');
         const details = $row.find('.details').text();
         const receipt = $row.find('.receipt').text();
         const amount = $row.find('.amount').text();
@@ -98,7 +107,7 @@
 
         $row.remove();
 
-        const $confirmedRow = $(`
+        const $confirmedRow =$(`
             <tr data-id="${receipt}">
                 <td class="details">${details}</td>
                 <td class="receipt">${receipt}</td>
@@ -117,7 +126,7 @@
     });
 
     $(document).on('click', '.btn-complete-order', function () {
-        const $row = $(this).closest('tr');
+        const $row =$(this).closest('tr');
         const details = $row.find('.details').text();
         const receipt = $row.find('.receipt').text();
         const amount = $row.find('.amount').text();
@@ -125,7 +134,7 @@
 
         $row.remove();
 
-        const $completedRow = $(`
+        const $completedRow =$(`
             <tr>
                 <td class="details">${details}</td>
                 <td class="receipt">${receipt}</td>
