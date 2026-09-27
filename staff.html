@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joey's Farm</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="staff.css">
+</head>
+<body>
 
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <a class="navbar-brand" href="#" id="brand-link">
+            <div class="logo-badge">
+                <img src="logo.png" alt="Joey's Farm Logo" class="logo-img"> 
+            </div>
+            <span>Joey's Farm</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-target="home-section">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="inventory-section">Inventory</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-target="orders-section">Orders</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="container my-4">
+        <div class="main-container rounded">
+
+            <div id="home-section" class="tab-content-page active">
+                <div class="wireframe-box">
+                    <h2 class="section-title mb-4">Sales dashboard</h2>
+                    <div class="row text-center py-3">
+                        <div class="col-md-4 mb-3">
+                            <div class="sales-card">
+                                <span class="sales-label">Weekly</span>
+                                <span class="sales-value" id="val-weekly">₱ 14,250.00</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="sales-card">
+                                <span class="sales-label">Monthly</span>
+                                <span class="sales-value" id="val-monthly">₱ 58,900.00</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="sales-card">
+                                <span class="sales-label">Daily</span>
+                                <span class="sales-value" id="val-daily">₱ 2,100.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h3 class="section-title">Most recent order history</h3>
+                    <div class="table-responsive">
+                        <table class="table wireframe-table" id="recent-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order details</th>
+                                    <th>Receipt no.</th>
+                                    <th>Amount to be paid</th>
+                                    <th>Delivery date</th>
+                                    <th>Delivery Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!--  INVENTORY SECTION -->
+            <div id="inventory-section" class="tab-content-page">
+                <h2 class="section-title">Inventory</h2>
+                <div class="table-responsive">
+                    <table class="table wireframe-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Product name</th>
+                                <th>Amount in total</th>
+                                <th>Fresh</th>
+                                <th>Near expiry</th>
+                                <th>Unsellable(i.e. basag )</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="table-input" value="Egg Tray (Medium)"></td>
+                                <td><input type="number" class="table-input total-calc" value="350" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="300"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="40"></td>
+                                <td><input type="number" class="table-input broken-qty" value="10"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="table-input" value="Egg Tray (Large)"></td>
+                                <td><input type="number" class="table-input total-calc" value="500" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="450"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="35"></td>
+                                <td><input type="number" class="table-input broken-qty" value="15"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" class="table-input" value="Egg Tray (XL)"></td>
+                                <td><input type="number" class="table-input total-calc" value="220" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="200"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="15"></td>
+                                <td><input type="number" class="table-input broken-qty" value="5"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tagalog-note">
+                    <i class="fas fa-info-circle mr-2 text-warning"></i>
+                    Keep The Inventory Updated.
+                </div>
+            </div>
+
+            <!--  ORDERS MANAGEMENT SECTION -->
+            <div id="orders-section" class="tab-content-page">
+                
+                <!-- Pending Orders Table -->
+                <div class="mb-5">
+                    <h3 class="section-title">Pending orders</h3>
+                    <div class="table-responsive">
+                        <table class="table wireframe-table" id="pending-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order details</th>
+                                    <th>Receipt no.</th>
+                                    <th>Amount to be paid</th>
+                                    <th>Delivery date</th>
+                                    <th colspan="2">Delivery Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-id="101">
+                                    <td class="details">5 Trays Large Eggs</td>
+                                    <td class="receipt">REC-2026-001</td>
+                                    <td class="amount">₱ 1,100</td>
+                                    <td class="date">2026-09-28</td>
+                                    <td colspan="2">
+                                        <button class="btn-pill-action btn-confirm-order">confirm</button>
+                                    </td>
+                                </tr>
+                                <tr data-id="102">
+                                    <td class="details">10 Trays Medium Eggs</td>
+                                    <td class="receipt">REC-2026-002</td>
+                                    <td class="amount">₱ 2,000</td>
+                                    <td class="date">2026-09-29</td>
+                                    <td colspan="2">
+                                        <button class="btn-pill-action btn-confirm-order">confirm</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Confirmed Orders Table -->
+                <div class="mb-5">
+                    <h3 class="section-title">Confirmed orders</h3>
+                    <div class="table-responsive">
+                        <table class="table wireframe-table" id="confirmed-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order details</th>
+                                    <th>Receipt no.</th>
+                                    <th>Amount to be paid</th>
+                                    <th>delivery date</th>
+                                    <th>Delivery Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-id="201">
+                                    <td class="details">3 Trays XL Eggs</td>
+                                    <td class="receipt">REC-2026-000</td>
+                                    <td class="amount">₱ 750</td>
+                                    <td class="date">2026-09-27</td>
+                                    <td>
+                                        <button class="btn-pill-action btn-complete-order">complete</button>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="table-input remark-field" placeholder="txt Input field" value="Out for delivery">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Completed Orders Table -->
+                <div class="mb-5">
+                    <h3 class="section-title">Completed orders</h3>
+                    <div class="table-responsive">
+                        <table class="table wireframe-table" id="completed-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order details</th>
+                                    <th>Receipt no.</th>
+                                    <th>Amount to be paid</th>
+                                    <th>Delivery date</th>
+                                    <th>Delivery Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="details">20 Trays Large Eggs</td>
+                                    <td class="receipt">REC-2026-B99</td>
+                                    <td class="amount">₱ 4,400</td>
+                                    <td class="date">2026-09-25</td>
+                                    <td><span class="badge badge-success px-3 py-2">Delivered</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cancelled Orders Table -->
+                <div class="mb-4">
+                    <h3 class="section-title">Cancelled orders</h3>
+                    <div class="table-responsive">
+                        <table class="table wireframe-table" id="cancelled-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order details</th>
+                                    <th>Receipt no.</th>
+                                    <th>Amount to be paid</th>
+                                    <th>Delivery date</th>
+                                    <th>Delivery Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="details">2 Trays Medium Eggs</td>
+                                    <td class="receipt">REC-2026-C01</td>
+                                    <td class="amount">₱ 400</td>
+                                    <td class="date">2026-09-24</td>
+                                    <td><span class="badge badge-danger px-3 py-2">Cancelled</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="staff.js"></script>
+</body>
+</html>
