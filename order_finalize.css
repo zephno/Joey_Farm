@@ -1,0 +1,142 @@
+body {
+    background-color: #f4efe6;
+    padding-bottom: 60px;
+}
+
+.navbar-custom {
+    background-color: #4a3525;
+    padding: 10px 20px;
+    border-bottom: 3px solid #e69500;
+}
+
+.cart-icon-circle {
+    background-color: white;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-left: 15px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+.back-btn {
+    color: #4a3525;
+    background: transparent;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 5px 0;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    color: #e69500;
+    text-decoration: none;
+}
+
+.checkout-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 40px;
+    margin-top: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.checkout-title {
+    color: #2b1e16;
+    font-weight: 700;
+    border-bottom: 2px solid #eae1d2;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.custom-label {
+    font-weight: 600;
+    color: #4a3525;
+}
+
+.custom-input {
+    border: 1px solid #d9cdbf;
+    border-radius: 8px;
+    background-color: #fcf8ee;
+    padding: 10px 15px;
+    box-shadow: none;
+    transition: all 0.3s;
+}
+
+.custom-input:focus {
+    border-color: #e69500;
+    background-color: white;
+}
+
+.btn-confirm {
+    background-color: #2e5016;
+    color: white;
+    border-radius: 20px;
+    padding: 8px 25px;
+    font-weight: 600;
+    border: 2px solid #2e5016;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-confirm:hover {
+    background-color: #3b661c;
+    border-color: #3b661c;
+    color: white;
+}
+
+.info-box {
+    background-color: #f4efe6;
+    border-left: 4px solid #e69500;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.info-text {
+    font-size: 1rem;
+    color: #4a3525;
+    margin: 0;
+    font-weight: 500;
+}
+
+.action-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #eae1d2;
+}
+
+.btn-finalize {
+    background-color: #e69500;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 40px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 2px solid #e69500;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(230, 149, 0, 0.2);
+}
+
+.btn-finalize:hover {
+    background-color: #cc8400;
+    border-color: #cc8400;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 15px rgba(230, 149, 0, 0.3);
+}
+
+.return-text {
+    color: #b8a695;
+    font-size: 0.95rem;
+    font-style: italic;
+}
