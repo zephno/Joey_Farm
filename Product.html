@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Joey's Farm - Product</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="Product-style.css">
+  </head>
+
+<body>
+    <nav class="navbar navbar-expand-md sticky-top">
+        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-navigation">
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn nav-login-btn" href="#" data-toggle="modal" data-target="#loginModal">Login</a>
+            </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container product-detail my-5">
+      <div class="row align-items-start">
+
+        <!-- Product Image -->
+        <div class="col-lg-5 col-md-6 col-12 mb-4">
+          <img id="productImage" src="" class="img-fluid product-detail-img" alt="Egg product">
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-7 col-md-6 col-12">
+        <h2 id="productTitle" class="product-detail-title"></h2>
+        <p id="productDesc" class="product-detail-desc"></p>
+
+        <!-- Tray Size Options -->
+        <div class="mb-4">
+            <label class="option-label">Choose Tray Size</label>
+            <div class="btn-group btn-group-toggle d-flex flex-wrap" data-toggle="buttons">
+            <label class="btn btn-outline-secondary tray-option">
+                <input type="radio" name="traySize" value="12"> 12-Egg Tray
+            </label>
+            <label class="btn btn-outline-secondary tray-option">
+                <input type="radio" name="traySize" value="24"> 24-Egg Tray
+            </label>
+            <label class="btn btn-outline-secondary tray-option">
+                <input type="radio" name="traySize" value="36"> 36-Egg Tray
+            </label>
+            </div>
+        </div>
+
+        <!-- Quantity Picker -->
+        <div class="mb-4">
+            <label class="option-label">Quantity</label>
+            <div class="quantity-picker d-flex align-items-center">
+            <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyMinus">−</button>
+            <input type="text" class="form-control text-center qty-input" id="qtyValue" value="1" readonly>
+            <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyPlus">+</button>
+            </div>
+        </div>
+
+        <!-- Price Display -->
+        <div class="mb-4">
+            <span class="option-label">Price:</span>
+            <span id="priceDisplay" class="price-display"></span>
+        </div>
+
+        <!-- Add to Cart -->
+        <button class="btn btn-secondary btn-lg add-to-cart-btn" id="addToCartBtn">Add to Cart</button>
+        </div>
+
+      </div>
+    </div>
+
+<footer class="page-footer">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-lg-8 col-md-8 col-sm-12">
+        <div class="text-uppercase font-weight-bold">Joey's Farm</div>
+        <p>
+        Joey's Farm is committed to sustainable agriculture and high-quality local produce.
+        We take pride in raising happy, pasture-fed hens to supply fresh, ethically sourced
+        organic eggs directly to kitchens across the community.
+        </p>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="text-uppercase font-weight-bold">Contact</div>
+        <p>
+          Address
+          +63 ***-****-***
+          joeyfarm@gmail.com
+        </p>
+      </div>
+
+    </div>
+
+    <div class="footer-copyright text-center">
+      © 2026 Copyright: Group 3 - The Good Team
+    </div>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<script src="main.js"></script>
+<script src="Product-script.js"></script>
+
+</body>
+</html>
