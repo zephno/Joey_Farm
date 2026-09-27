@@ -37,9 +37,10 @@
     </nav>
 
     <!-- MAIN DASHBOARD CONTENT -->
-    <div class="container my-4">
+    <div class="container-fluid my-4 px-4">
         <div class="main-container rounded">
 
+            <!-- HOME SECTION -->
             <div id="home-section" class="tab-content-page active">
                 <div class="wireframe-box">
                     <h2 class="section-title mb-4">Sales dashboard</h2>
@@ -86,41 +87,137 @@
                 </div>
             </div>
 
-            <!--  INVENTORY SECTION -->
+            <!-- INVENTORY SECTION -->
             <div id="inventory-section" class="tab-content-page">
-                <h2 class="section-title">Inventory</h2>
+                <h2 class="section-title mb-3">Inventory</h2>
                 <div class="table-responsive">
                     <table class="table wireframe-table" id="inventory-table">
                         <thead>
                             <tr>
-                                <th>Product name</th>
-                                <th>Amount in total</th>
-                                <th>Fresh</th>
-                                <th>Near expiry</th>
-                                <th>Unsellable(i.e. basag )</th>
+                                <th>Egg Size</th>
+                                <th>Tray Size</th>
+                                <th>Price / Tray</th>
+                                <th>Fresh (Trays)</th>
+                                <th>Near expiry (Trays)</th>
+                                <th>Unsellable (Trays)</th>
+                                <th>Total Trays</th>
+                                <th>Total Egg Qty</th>
+                                <th>Est. Total Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="text" class="table-input" value="Egg Tray (Medium)"></td>
-                                <td><input type="number" class="table-input total-calc" value="350" readonly></td>
+                            <!-- PEEWEE -->
+                            <tr data-egg-size="Peewee">
+                                <td><span class="size-badge">Peewee</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="87.00">12 Eggs</option>
+                                        <option value="24" data-price="172.00">24 Eggs</option>
+                                        <option value="36" data-price="258.00" selected>36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 258.00" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="20"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="2"></td>
+                                <td><input type="number" class="table-input broken-qty" value="1"></td>
+                                <td><input type="number" class="table-input total-trays" value="23" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="828" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 5,934.00" readonly></td>
+                            </tr>
+
+                            <!-- SMALL -->
+                            <tr data-egg-size="Small">
+                                <td><span class="size-badge">Small</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="92.00">12 Eggs</option>
+                                        <option value="24" data-price="184.00">24 Eggs</option>
+                                        <option value="36" data-price="276.00" selected>36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 276.00" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="40"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="5"></td>
+                                <td><input type="number" class="table-input broken-qty" value="2"></td>
+                                <td><input type="number" class="table-input total-trays" value="47" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="1692" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 12,972.00" readonly></td>
+                            </tr>
+
+                            <!-- MEDIUM -->
+                            <tr data-egg-size="Medium">
+                                <td><span class="size-badge">Medium</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="98.00">12 Eggs</option>
+                                        <option value="24" data-price="195.00">24 Eggs</option>
+                                        <option value="36" data-price="293.00" selected>36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 293.00" readonly></td>
                                 <td><input type="number" class="table-input fresh-qty" value="300"></td>
                                 <td><input type="number" class="table-input expiry-qty" value="40"></td>
                                 <td><input type="number" class="table-input broken-qty" value="10"></td>
+                                <td><input type="number" class="table-input total-trays" value="350" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="12600" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 102,550.00" readonly></td>
                             </tr>
-                            <tr>
-                                <td><input type="text" class="table-input" value="Egg Tray (Large)"></td>
-                                <td><input type="number" class="table-input total-calc" value="500" readonly></td>
+
+                            <!-- LARGE -->
+                            <tr data-egg-size="Large">
+                                <td><span class="size-badge">Large</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="103.00">12 Eggs</option>
+                                        <option value="24" data-price="207.00">24 Eggs</option>
+                                        <option value="36" data-price="310.00" selected>36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 310.00" readonly></td>
                                 <td><input type="number" class="table-input fresh-qty" value="450"></td>
                                 <td><input type="number" class="table-input expiry-qty" value="35"></td>
                                 <td><input type="number" class="table-input broken-qty" value="15"></td>
+                                <td><input type="number" class="table-input total-trays" value="500" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="18000" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 155,000.00" readonly></td>
                             </tr>
-                            <tr>
-                                <td><input type="text" class="table-input" value="Egg Tray (XL)"></td>
-                                <td><input type="number" class="table-input total-calc" value="220" readonly></td>
+
+                            <!-- EXTRA LARGE -->
+                            <tr data-egg-size="Extra Large">
+                                <td><span class="size-badge">Extra Large</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="109.00">12 Eggs</option>
+                                        <option value="24" data-price="218.00" selected>24 Eggs</option>
+                                        <option value="36" data-price="327.00">36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 218.00" readonly></td>
                                 <td><input type="number" class="table-input fresh-qty" value="200"></td>
                                 <td><input type="number" class="table-input expiry-qty" value="15"></td>
                                 <td><input type="number" class="table-input broken-qty" value="5"></td>
+                                <td><input type="number" class="table-input total-trays" value="220" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="5280" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 47,960.00" readonly></td>
+                            </tr>
+
+                            <!-- JUMBO -->
+                            <tr data-egg-size="Jumbo">
+                                <td><span class="size-badge">Jumbo</span></td>
+                                <td>
+                                    <select class="table-input tray-select">
+                                        <option value="12" data-price="115.00">12 Eggs</option>
+                                        <option value="24" data-price="230.00">24 Eggs</option>
+                                        <option value="36" data-price="345.00" selected>36 Eggs</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="table-input price-display" value="₱ 345.00" readonly></td>
+                                <td><input type="number" class="table-input fresh-qty" value="110"></td>
+                                <td><input type="number" class="table-input expiry-qty" value="8"></td>
+                                <td><input type="number" class="table-input broken-qty" value="2"></td>
+                                <td><input type="number" class="table-input total-trays" value="120" readonly></td>
+                                <td><input type="number" class="table-input total-eggs" value="4320" readonly></td>
+                                <td><input type="text" class="table-input total-value" value="₱ 41,400.00" readonly></td>
                             </tr>
                         </tbody>
                     </table>
@@ -132,7 +229,7 @@
                 </div>
             </div>
 
-            <!--  ORDERS MANAGEMENT SECTION -->
+            <!-- ORDERS MANAGEMENT SECTION -->
             <div id="orders-section" class="tab-content-page">
                 
                 <!-- Pending Orders Table -->
@@ -151,18 +248,18 @@
                             </thead>
                             <tbody>
                                 <tr data-id="101">
-                                    <td class="details">5 Trays Large Eggs</td>
+                                    <td class="details">5 Trays (36 Eggs/Tray) • 180 Eggs Total - Large</td>
                                     <td class="receipt">REC-2026-001</td>
-                                    <td class="amount">₱ 1,100</td>
+                                    <td class="amount">₱ 1,550.00</td>
                                     <td class="date">2026-09-28</td>
                                     <td colspan="2">
                                         <button class="btn-pill-action btn-confirm-order">confirm</button>
                                     </td>
                                 </tr>
                                 <tr data-id="102">
-                                    <td class="details">10 Trays Medium Eggs</td>
+                                    <td class="details">10 Trays (24 Eggs/Tray) • 240 Eggs Total - Medium</td>
                                     <td class="receipt">REC-2026-002</td>
-                                    <td class="amount">₱ 2,000</td>
+                                    <td class="amount">₱ 1,950.00</td>
                                     <td class="date">2026-09-29</td>
                                     <td colspan="2">
                                         <button class="btn-pill-action btn-confirm-order">confirm</button>
@@ -183,16 +280,16 @@
                                     <th>Order details</th>
                                     <th>Receipt no.</th>
                                     <th>Amount to be paid</th>
-                                    <th>delivery date</th>
+                                    <th>Delivery date</th>
                                     <th>Delivery Status</th>
                                     <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr data-id="201">
-                                    <td class="details">3 Trays XL Eggs</td>
+                                    <td class="details">3 Trays (12 Eggs/Tray) • 36 Eggs Total - XL</td>
                                     <td class="receipt">REC-2026-000</td>
-                                    <td class="amount">₱ 750</td>
+                                    <td class="amount">₱ 327.00</td>
                                     <td class="date">2026-09-27</td>
                                     <td>
                                         <button class="btn-pill-action btn-complete-order">complete</button>
@@ -222,9 +319,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="details">20 Trays Large Eggs</td>
+                                    <td class="details">20 Trays (36 Eggs/Tray) • 720 Eggs Total - Large</td>
                                     <td class="receipt">REC-2026-B99</td>
-                                    <td class="amount">₱ 4,400</td>
+                                    <td class="amount">₱ 6,200.00</td>
                                     <td class="date">2026-09-25</td>
                                     <td><span class="badge badge-success px-3 py-2">Delivered</span></td>
                                 </tr>
@@ -249,9 +346,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="details">2 Trays Medium Eggs</td>
+                                    <td class="details">2 Trays (12 Eggs/Tray) • 24 Eggs Total - Medium</td>
                                     <td class="receipt">REC-2026-C01</td>
-                                    <td class="amount">₱ 400</td>
+                                    <td class="amount">₱ 196.00</td>
                                     <td class="date">2026-09-24</td>
                                     <td><span class="badge badge-danger px-3 py-2">Cancelled</span></td>
                                 </tr>
