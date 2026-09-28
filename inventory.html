@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joey's Farm | Inventory</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="inventory.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark inventory-navbar sticky-top">
+        <a class="navbar-brand" href="staff.html" aria-label="Joey's Farm staff home">
+            <img src="images/logo.png" alt="Joey's Farm" class="inventory-logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#inventoryNavigation" aria-controls="inventoryNavigation"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="inventoryNavigation">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="staff.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="inventory.html" aria-current="page">Inventory</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="staff.html#orders-section">Orders</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container-fluid inventory-page px-3 px-md-4 py-4">
+        <h1 class="h2 mb-3">Inventory</h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered inventory-table">
+                <caption class="sr-only">Egg stock quantities by egg size</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Product name</th>
+                        <th scope="col">Amount in total (eggs)</th>
+                        <th scope="col">Fresh (eggs)</th>
+                        <th scope="col">Near expiry (eggs)</th>
+                        <th scope="col">Unsellable (eggs, e.g. cracked)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Peewee eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[peewee][total]" min="0" value="792" aria-label="Total Peewee eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[peewee][fresh]" min="0" value="720" aria-label="Fresh Peewee eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[peewee][near_expiry]" min="0" value="72" aria-label="Near expiry Peewee eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[peewee][unsellable]" min="0" value="36" aria-label="Unsellable Peewee eggs"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Small eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[small][total]" min="0" value="1620" aria-label="Total Small eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[small][fresh]" min="0" value="1440" aria-label="Fresh Small eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[small][near_expiry]" min="0" value="180" aria-label="Near expiry Small eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[small][unsellable]" min="0" value="72" aria-label="Unsellable Small eggs"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Medium eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[medium][total]" min="0" value="12240" aria-label="Total Medium eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[medium][fresh]" min="0" value="10800" aria-label="Fresh Medium eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[medium][near_expiry]" min="0" value="1440" aria-label="Near expiry Medium eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[medium][unsellable]" min="0" value="360" aria-label="Unsellable Medium eggs"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Large eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[large][total]" min="0" value="17460" aria-label="Total Large eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[large][fresh]" min="0" value="16200" aria-label="Fresh Large eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[large][near_expiry]" min="0" value="1260" aria-label="Near expiry Large eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[large][unsellable]" min="0" value="540" aria-label="Unsellable Large eggs"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Extra large eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[extra_large][total]" min="0" value="5160" aria-label="Total Extra large eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[extra_large][fresh]" min="0" value="4800" aria-label="Fresh Extra large eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[extra_large][near_expiry]" min="0" value="360" aria-label="Near expiry Extra large eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[extra_large][unsellable]" min="0" value="120" aria-label="Unsellable Extra large eggs"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Jumbo eggs</th>
+                        <td><input class="form-control inventory-input inventory-total" type="number" name="inventory[jumbo][total]" min="0" value="4248" aria-label="Total Jumbo eggs" readonly></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[jumbo][fresh]" min="0" value="3960" aria-label="Fresh Jumbo eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[jumbo][near_expiry]" min="0" value="288" aria-label="Near expiry Jumbo eggs"></td>
+                        <td><input class="form-control inventory-input" type="number" name="inventory[jumbo][unsellable]" min="0" value="72" aria-label="Unsellable Jumbo eggs"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="inventory.js"></script>
+</body>
+</html>
