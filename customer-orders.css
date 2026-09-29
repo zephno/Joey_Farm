@@ -123,6 +123,86 @@ body {
     border-radius: 1.5rem;
 }
 
+#loginModal .modal-content {
+    background-color: #f4efe6;
+    border: 1px solid #37261a;
+    border-radius: 8px;
+    color: #2b1e16;
+}
+
+#loginModal .modal-header {
+    background-color: #4a3525;
+    color: #fcf8ee;
+    border-bottom: 1px solid #37261a;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+
+#loginModal .modal-header .close {
+    color: #fcf8ee;
+    opacity: 0.8;
+    text-shadow: none;
+}
+
+#loginModal .modal-header .close:hover {
+    color: #e69500;
+    opacity: 1;
+}
+
+#loginModal .modal-title {
+    font-weight: 700;
+    color: #fcf8ee;
+}
+
+#loginModal .modal-body label {
+    font-weight: 600;
+    color: #4a3525;
+}
+
+#loginModal .modal-body .form-control {
+    border: 1px solid #b8a695;
+    background-color: #ffffff;
+    border-radius: 4px;
+}
+
+#loginModal .modal-body .form-control:focus {
+    border-color: #e69500;
+    box-shadow: 0 0 0 0.2rem rgba(230, 149, 0, 0.25);
+}
+
+#loginModal .modal-body .btn-primary {
+    background-color: #e69500;
+    border-color: #e69500;
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+#loginModal .modal-body .btn-primary:hover,
+#loginModal .modal-body .btn-primary:focus {
+    background-color: #cc8400;
+    border-color: #cc8400;
+    color: #ffffff;
+}
+
+#loginModal .modal-footer {
+    background-color: #eae1d2;
+    border-top: 1px solid #b8a695;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+#loginModal .modal-footer a {
+    color: #2e5016;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+#loginModal .modal-footer a:hover {
+    color: #e69500;
+    text-decoration: underline;
+}
+
 @media (max-width: 575.98px) {
     .customer-navbar {
         padding-right: 1rem;
