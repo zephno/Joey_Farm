@@ -149,4 +149,5 @@ $(document).ready(function () {
 
     updateInventoryTotals();
     refreshRecentOrders();
-});
+})
+    ;
