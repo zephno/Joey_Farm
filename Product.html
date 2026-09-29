@@ -10,23 +10,18 @@
   </head>
 
 <body>
-    <nav class="navbar navbar-expand-md fixed-top">
-        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="main-navigation">
-          <ul class="navbar-nav align-items-center">
-            <li class="nav-item">
-              <a class="nav-link nav-outline-text" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-outline-text" href="#">About</a>
-            </li>
-            <li class="nav-item">
-              <a class="btn nav-login-btn" href="#" data-toggle="modal" data-target="#loginModal">Login</a>
-            </li>
-        </ul>
-      </div>
+    <nav class="navbar navbar-expand-md navbar-custom align-items-center justify-content-between">
+        <a class="navbar-brand" href="Index.html">
+            <img src="images/logo.png" alt="Joey's Farm" style="height: 50px;">
+        </a>
+        <div class="d-flex align-items-center">
+            <a class="nav-link nav-outline-text" href="customer-orders.html">Home</a>
+            <a class="nav-link nav-outline-text" href="Order.html">Order</a>
+            <a class="btn nav-login-btn" href="Index.html">Logout</a>
+            <div class="cart-icon-circle text-dark">
+                🛒
+            </div>
+        </div>
     </nav>
 
     <div class="container product-detail my-5">
