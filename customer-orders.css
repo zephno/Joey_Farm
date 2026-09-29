@@ -1,8 +1,3 @@
-:root {
-    --farm-brown: #3b1904;
-    --farm-purple: #4a47a3;
-}
-
 body {
     min-height: 100vh;
     background-color: #f4f6f9;
@@ -55,28 +50,11 @@ body {
   justify-content: flex-end;
 }
 
-.cart-link {
-    display: flex;
-    width: 58px;
-    height: 58px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #fff;
-    font-size: 1.6rem;
-    text-decoration: none;
-}
-
-.cart-link:hover {
-    text-decoration: none;
-    background: #f1f1f1;
-}
-
 .customer-details-card {
     max-width: 1160px;
     padding: 1.25rem;
     border: 2px solid #212529;
-    background-color: #fff;
+    background-color: whitesmoke;
 }
 
 .customer-details-card .form-row {
@@ -84,22 +62,37 @@ body {
 }
 
 .customer-details-card .col-form-label {
-    font-size: 1.1rem;
+    font-size: 18px;
     font-weight: 500;
 }
 
 .btn-confirm {
-    border-color: var(--farm-purple);
+    border-color: #044ce6;
     border-radius: 1.5rem;
-    background-color: var(--farm-purple);
+    background-color: #044ce6;
     color: #fff;
+    
 }
 
 .btn-confirm:hover,
 .btn-confirm:focus {
-    border-color: #363482;
-    background-color: #363482;
+    border-color: #0034a3;
+    background-color: #0034a3;
     color: #fff;
+    transition: all 0.5s;
+}
+
+.btn-edit{
+    border: 1px solid lightblue;
+    border-radius: 1.5rem;
+    background-color: lightblue;
+    color: #fff;
+}
+
+.btn-edit:hover,
+.btn-edit:focus{
+    border-color: lightblue;
+    background-color: lightblue;
 }
 
 .order-history-table {
@@ -109,7 +102,7 @@ body {
 
 .order-history-table th,
 .order-history-table td {
-    text-align: center;
+    text-align: left;
     vertical-align: middle;
 }
 
