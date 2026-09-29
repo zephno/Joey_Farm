@@ -56,10 +56,11 @@ $(document).ready(function () {
     }
 
     $('.nav-link').on('click', function (e) {
+        const target = $(this).data('target');
+        if (!target) return;
         e.preventDefault();
         $('.nav-link').removeClass('active');$(this).addClass('active');
 
-        const target = $(this).data('target');
         $('.tab-content-page').removeClass('active');$('#' + target).addClass('active');
 
         if (target === 'home-section') {
@@ -78,7 +79,6 @@ $(document).ready(function () {
             const traySize = parseInt($traySelect.val(), 10) || 36;
             const pricePerTray = parseFloat($traySelect.find(':selected').data('price')) || 0;
 
-            // Update Price per Tray input display
             $(this).find('.price-display').val(`₱ ${pricePerTray.toFixed(2)}`);
 
             const fresh = parseInt($(this).find('.fresh-qty').val(), 10) || 0;
@@ -149,5 +149,9 @@ $(document).ready(function () {
 
     updateInventoryTotals();
     refreshRecentOrders();
-})
-    ;
+
+    const hashTarget = window.location.hash.replace('#', '');
+    if (hashTarget) {
+        $('.nav-link[data-target="' + hashTarget + '"]').click();
+    }
+});
