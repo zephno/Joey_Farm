@@ -97,5 +97,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  document.getElementById("addToCartBtn").addEventListener("click", function () {
+    if (!document.querySelector('input[name="traySize"]:checked')) {
+      alert("Please choose a tray size first.");
+      return;
+    }
+    window.location.href = "cart.html";
+  });
+
   updatePrice(); // initial state — blank until a tray size is picked
 });
