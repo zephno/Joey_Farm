@@ -7,33 +7,28 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="staff.css">
+    <link rel="stylesheet" href="navbar.css">
 </head>
-<body>
+<body class="has-fixed-nav">
 
     <!-- NAVIGATION BAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-        <a class="navbar-brand" href="#" id="brand-link">
-            <div class="logo-badge">
-                <img src="images/logo.png" alt="Joey's Farm Logo" class="logo-img"> 
-            </div>
-            <span>Joey's Farm</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+    <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
+        <div class="collapse navbar-collapse" id="main-navigation">
+            <ul class="navbar-nav align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#" data-target="home-section">Home</a>
+                    <a class="nav-link nav-outline-text active" href="#" data-target="home-section">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-target="inventory-section">Inventory</a>
+                    <a class="nav-link nav-outline-text" href="#" data-target="inventory-section">Inventory</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-target="orders-section">Orders</a>
+                    <a class="nav-link nav-outline-text" href="#" data-target="orders-section">Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="Index.html">Logout</a>
+                    <a class="btn nav-login-btn" href="Index.html">Logout</a>
                 </li>
             </ul>
         </div>
