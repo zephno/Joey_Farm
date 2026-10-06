@@ -7,21 +7,30 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="main.css">
     <link rel="stylesheet" type="text/css" href="cart.css">
+    <link rel="stylesheet" type="text/css" href="navbar.css">
 </head>
-<body>
+<body class="has-fixed-nav">
 
-    <nav class="navbar navbar-expand-md navbar-custom align-items-center justify-content-between">
-        <a class="navbar-brand" href="Index.html">
-            <img src="images/logo.png" alt="Joey's Farm" style="height: 50px;">
-        </a>
-        <div class="d-flex align-items-center">
-            <a class="nav-link nav-outline-text" href="customer-orders.html">Home</a>
-            <a class="nav-link nav-outline-text" href="Order.html">Order</a>
-            <a class="btn nav-login-btn" href="Index.html">Logout</a>
-            <div class="cart-icon-circle text-dark">
-                🛒
-            </div>
-        </div>
+    <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-navigation">
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text" href="customer-orders.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text" href="Order.html">Order</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn nav-login-btn" href="Index.html">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="cart-icon-circle text-dark" href="cart.html" title="Cart">🛒</a>
+            </li>
+        </ul>
+      </div>
     </nav>
 
     <div class="container mt-4">
@@ -31,66 +40,22 @@
         
         <h3 class="mb-4 text-dark font-weight-bold">Your Cart</h3>
 
-        <div class="col-lg-10 mx-auto">
-            
-            <div class="cart-item-card d-flex flex-column flex-md-row align-items-center mb-4">
-                <div class="product-img-placeholder mb-3 mb-md-0 mr-md-4">
-                    Product<br>Image
-                </div>
-                <div class="d-flex flex-column flex-md-row align-items-center w-100 justify-content-between">
-                    <h5 class="product-title mb-3 mb-md-0">Small Eggs (1 Dozen)</h5>
-                    <div class="d-flex align-items-center ml-md-auto">
-                        <div class="qty-control mr-4">
-                            <button class="qty-btn">-</button>
-                            <span class="qty-display">1</span>
-                            <button class="qty-btn">+</button>
-                        </div>
-                        <span class="trash-icon" title="Remove item">🗑️</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cart-item-card d-flex flex-column flex-md-row align-items-center mb-4">
-                <div class="product-img-placeholder mb-3 mb-md-0 mr-md-4">
-                    Product<br>Image
-                </div>
-                <div class="d-flex flex-column flex-md-row align-items-center w-100 justify-content-between">
-                    <h5 class="product-title mb-3 mb-md-0">Medium Eggs (Tray)</h5>
-                    <div class="d-flex align-items-center ml-md-auto">
-                        <div class="qty-control mr-4">
-                            <button class="qty-btn">-</button>
-                            <span class="qty-display">1</span>
-                            <button class="qty-btn">+</button>
-                        </div>
-                        <span class="trash-icon" title="Remove item">🗑️</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cart-item-card d-flex flex-column flex-md-row align-items-center mb-4">
-                <div class="product-img-placeholder mb-3 mb-md-0 mr-md-4">
-                    Product<br>Image
-                </div>
-                <div class="d-flex flex-column flex-md-row align-items-center w-100 justify-content-between">
-                    <h5 class="product-title mb-3 mb-md-0">Jumbo Eggs (Tray)</h5>
-                    <div class="d-flex align-items-center ml-md-auto">
-                        <div class="qty-control mr-4">
-                            <button class="qty-btn">-</button>
-                            <span class="qty-display">1</span>
-                            <button class="qty-btn">+</button>
-                        </div>
-                        <span class="trash-icon" title="Remove item">🗑️</span>
-                    </div>
-                </div>
-            </div>
-
-
+        <div class="col-lg-10 mx-auto" id="cartItems">
+            <!-- Cart items are rendered here by cart.js -->
         </div>
     </div>
 
     <div class="bottom-bar">
-        <a href="order_finalize.html" class="btn btn-finalize">Proceed to Checkout</a>
+        <div class="cart-total-wrap">
+            <span class="cart-total-label">Total:</span>
+            <span class="cart-total" id="cartTotal">₱ 0.00</span>
+        </div>
+        <a href="order_finalize.html" class="btn btn-finalize" id="checkoutBtn">Proceed to Checkout</a>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="main.js"></script>
+    <script src="cart.js"></script>
 </body>
 </html>
