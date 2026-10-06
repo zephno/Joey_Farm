@@ -6,32 +6,29 @@
     <title>Joey's Farm | Inventory</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="inventory.css">
+    <link rel="stylesheet" href="navbar.css">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark inventory-navbar sticky-top">
-        <a class="navbar-brand" href="staff.html" aria-label="Joey's Farm staff home">
-            <img src="images/logo.png" alt="Joey's Farm" class="inventory-logo">
-        </a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#inventoryNavigation" aria-controls="inventoryNavigation"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+<body class="has-fixed-nav">
+    <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+        <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+          <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="inventoryNavigation">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="staff.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="inventory.html" aria-current="page">Inventory</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="staff.html#orders-section">Orders</a>
-                </li>
-            </ul>
-        </div>
+        <div class="collapse navbar-collapse" id="main-navigation">
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text" href="staff.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text active" href="inventory.html" aria-current="page">Inventory</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text" href="staff.html#orders-section">Orders</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn nav-login-btn" href="Index.html">Logout</a>
+            </li>
+        </ul>
+      </div>
     </nav>
 
     <main class="container-fluid inventory-page px-3 px-md-4 py-4">
