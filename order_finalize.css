@@ -3,24 +3,6 @@ body {
     padding-bottom: 60px;
 }
 
-.navbar-custom {
-    background-color: #4a3525;
-    padding: 10px 20px;
-}
-
-.cart-icon-circle {
-    background-color: white;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    margin-left: 15px;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
-}
-
 .back-btn {
     color: #4a3525;
     background: transparent;
@@ -39,66 +21,57 @@ body {
     text-decoration: none;
 }
 
-.checkout-card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 40px;
-    margin-top: 15px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+/* Customer details form — same look as customer-orders.html */
+.customer-details-card {
+    max-width: 1160px;
+    padding: 1.25rem;
+    border: 2px solid #212529;
+    background-color: whitesmoke;
 }
 
-.checkout-title {
-    color: #2b1e16;
-    font-weight: 700;
-    border-bottom: 2px solid #eae1d2;
-    padding-bottom: 15px;
-    margin-bottom: 30px;
+.customer-details-card .form-row {
+    max-width: 780px;
 }
 
-.custom-label {
-    font-weight: 600;
-    color: #4a3525;
-}
-
-.custom-input {
-    border: 1px solid #d9cdbf;
-    border-radius: 8px;
-    background-color: #fcf8ee;
-    padding: 10px 15px;
-    box-shadow: none;
-    transition: all 0.3s;
-}
-
-.custom-input:focus {
-    border-color: #e69500;
-    background-color: white;
+.customer-details-card .col-form-label {
+    font-size: 18px;
+    font-weight: 500;
 }
 
 .btn-confirm {
-    background-color: #2e5016;
-    color: white;
-    border-radius: 20px;
-    padding: 8px 25px;
-    font-weight: 600;
-    border: 2px solid #2e5016;
-    transition: all 0.2s;
-    width: 100%;
+    border-color: #044ce6;
+    border-radius: 1.5rem;
+    background-color: #044ce6;
+    color: #fff;
 }
 
-.btn-confirm:hover {
-    background-color: #3b661c;
-    border-color: #3b661c;
-    color: white;
+.btn-confirm:hover,
+.btn-confirm:focus {
+    border-color: #0034a3;
+    background-color: #0034a3;
+    color: #fff;
+    transition: all 0.5s;
+}
+
+.btn-edit {
+    border: 1px solid lightblue;
+    border-radius: 1.5rem;
+    background-color: lightblue;
+    color: #fff;
+}
+
+.btn-edit:hover,
+.btn-edit:focus {
+    border-color: lightblue;
+    background-color: lightblue;
 }
 
 .info-box {
     background-color: #f4efe6;
     border-left: 4px solid #e69500;
-    padding: 20px;
+    padding: 15px 20px;
     border-radius: 0 8px 8px 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
+    max-width: 780px;
 }
 
 .info-text {
@@ -109,9 +82,9 @@ body {
 }
 
 .action-footer {
-    margin-top: 40px;
+    margin-top: 30px;
     padding-top: 20px;
-    border-top: 2px solid #eae1d2;
+    border-top: 2px solid #dee2e6;
 }
 
 .btn-finalize {
@@ -135,7 +108,7 @@ body {
 }
 
 .return-text {
-    color: #b8a695;
+    color: #6c757d;
     font-size: 0.95rem;
     font-style: italic;
 }
