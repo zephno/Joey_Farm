@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var CART_KEY = "joeysFarmCart";
 
-  // ---- 1. Product data: everything about each egg size lives here ----
+  // ---- 1. Product data ----
+  // These are only a fallback. The real list comes from the database (api_products.php),
+  // so changes made in Product Maintenance show up here automatically.
   var products = {
     peewee: {
       title: "Peewee",
@@ -42,111 +44,279 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // ---- 2. Read ?size=... from the URL ----
-  var params = new URLSearchParams(window.location.search);
-  var sizeKey = params.get("size");
-  var product = products[sizeKey];
+  var POLL_MS = 15000;
+  var started = false;
 
-  // Fallback in case the URL is missing or invalid
-  if (!product) {
-    sizeKey = "small";
-    product = products["small"];
+  // Ask the database for the live product list (prices AND stock), then start the page.
+  // If the request fails (e.g. PHP is not running) the fallback above is used, without stock limits.
+  function fetchProducts() {
+    return fetch("api_products.php", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && Object.keys(data).length) { products = data; return true; }
+        return false;
+      })
+      .catch(function () { return false; });
   }
 
-  // ---- 3. Fill in the page content ----
-  document.getElementById("productTitle").textContent = product.title;
-  document.getElementById("productDesc").textContent = product.desc;
-  document.getElementById("productImage").src = product.image;
-  document.getElementById("productImage").alt = product.title + " Eggs";
-  document.title = "Joey's Farm - " + product.title;
+  fetchProducts().then(function () { start(); });
 
-  // ---- 4. Quantity + tray + price logic ----
-  var qtyInput = document.getElementById("qtyValue");
-  var minusBtn = document.getElementById("qtyMinus");
-  var plusBtn = document.getElementById("qtyPlus");
-  var priceDisplay = document.getElementById("priceDisplay");
-  var trayLabels = document.querySelectorAll(".tray-option");
+  function start() {
+    if (started) return;
+    started = true;
 
-  function updatePrice() {
-    var selectedTray = document.querySelector('input[name="traySize"]:checked');
-    if (!selectedTray) {
-      priceDisplay.textContent = "";
-      return;
+    // ---- 2. Read ?size=... from the URL ----
+    var params = new URLSearchParams(window.location.search);
+    var sizeKey = params.get("size");
+    var product = products[sizeKey];
+
+    // Fallback in case the URL is missing, invalid, or the product was removed
+    if (!product) {
+      sizeKey = products["small"] ? "small" : Object.keys(products)[0];
+      product = products[sizeKey];
     }
-    var traySize = selectedTray.value;
-    var qty = parseInt(qtyInput.value, 10);
-    var unitPrice = product.prices[traySize];
-    var total = unitPrice * qty;
-    priceDisplay.textContent = "₱ " + total.toFixed(2);
-  }
 
-  minusBtn.addEventListener("click", function () {
-    var current = parseInt(qtyInput.value, 10);
-    if (current > 1) {
-      qtyInput.value = current - 1;
-      updatePrice();
+    // ---- 3. Fill in the page content ----
+    document.getElementById("productTitle").textContent = product.title;
+    document.getElementById("productDesc").textContent = product.desc;
+    document.getElementById("productImage").src = product.image;
+    document.getElementById("productImage").alt = product.title + " Eggs";
+    document.title = "Joey's Farm - " + product.title;
+
+    // ---- 4. Quantity + tray + price + stock logic ----
+    var qtyInput = document.getElementById("qtyValue");
+    var minusBtn = document.getElementById("qtyMinus");
+    var plusBtn = document.getElementById("qtyPlus");
+    var priceDisplay = document.getElementById("priceDisplay");
+    var addBtn = document.getElementById("addToCartBtn");
+    var trayLabels = document.querySelectorAll(".tray-option");
+    var TRAYS = ["12", "24", "36"];
+
+    // Small status line under the tray buttons (created here so Product.html needs no edit).
+    var trayGroup = trayLabels.length ? trayLabels[0].parentNode : null;
+    var note = document.createElement("div");
+    note.id = "stockNote";
+    note.className = "small mt-2";
+    if (trayGroup && trayGroup.parentNode) {
+      trayGroup.parentNode.insertBefore(note, trayGroup.nextSibling);
     }
-  });
 
-  plusBtn.addEventListener("click", function () {
-    var current = parseInt(qtyInput.value, 10);
-    qtyInput.value = current + 1;
-    updatePrice();
-  });
-
-  trayLabels.forEach(function (label) {
-    label.addEventListener("click", function () {
-      setTimeout(updatePrice, 0);
+    // One "N available" line inside each tray button.
+    var badges = {};
+    trayLabels.forEach(function (label) {
+      var input = label.querySelector("input");
+      var span = document.createElement("small");
+      span.className = "d-block tray-stock";
+      label.appendChild(span);
+      if (input) badges[input.value] = span;
     });
-  });
 
-  // ---- 5. Add to cart (saved in the browser, read by cart.html) ----
-  function loadCart() {
-    try {
-      var cart = JSON.parse(localStorage.getItem(CART_KEY));
-      return Array.isArray(cart) ? cart : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  document.getElementById("addToCartBtn").addEventListener("click", function () {
-    var selectedTray = document.querySelector('input[name="traySize"]:checked');
-    if (!selectedTray) {
-      alert("Please choose a tray size first.");
-      return;
+    function loadCart() {
+      try {
+        var cart = JSON.parse(localStorage.getItem(CART_KEY));
+        return Array.isArray(cart) ? cart : [];
+      } catch (err) {
+        return [];
+      }
     }
 
-    var tray = selectedTray.value;
-    var qty = parseInt(qtyInput.value, 10) || 1;
-    var id = sizeKey + "-" + tray;
+    // Eggs of THIS size already sitting in the cart (any tray size).
+    function eggsInCart() {
+      return loadCart().reduce(function (sum, item) {
+        return item.size === sizeKey ? sum + (item.tray * item.qty) : sum;
+      }, 0);
+    }
 
-    var cart = loadCart();
-    var existing = cart.filter(function (item) { return item.id === id; })[0];
+    // null = unknown (API down) -> no limit shown, server still checks at checkout.
+    function hasStockInfo() {
+      return !!(product.stock && typeof product.stock.eggs === "number");
+    }
 
-    if (existing) {
-      existing.qty += qty;
-    } else {
-      cart.push({
-        id: id,
-        size: sizeKey,
-        title: product.title,
-        image: product.image,
-        tray: parseInt(tray, 10),
-        unitPrice: product.prices[tray],
-        qty: qty
+    // How many trays of this size the customer can still add right now.
+    function maxTrays(tray) {
+      if (!hasStockInfo()) return Infinity;
+      var left = product.stock.eggs - eggsInCart();
+      return Math.max(0, Math.floor(left / parseInt(tray, 10)));
+    }
+
+    function selectedTray() {
+      var s = document.querySelector('input[name="traySize"]:checked');
+      return s ? s.value : null;
+    }
+
+    function selectTray(value) {
+      trayLabels.forEach(function (label) {
+        var input = label.querySelector("input");
+        var on = input && input.value === value;
+        if (input) input.checked = !!on;
+        label.classList.toggle("active", !!on);
       });
     }
 
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch (err) {
-      alert("Sorry, your cart could not be saved in this browser.");
-      return;
+    function updatePrice() {
+      var tray = selectedTray();
+      if (!tray) {
+        priceDisplay.textContent = "";
+        return;
+      }
+      var qty = parseInt(qtyInput.value, 10) || 1;
+      priceDisplay.textContent = "₱ " + (product.prices[tray] * qty).toFixed(2);
     }
 
-    window.location.href = "cart.html";
-  });
+    // Re-draws everything that depends on stock. Safe to call any time.
+    function refreshStock() {
+      var anyAvailable = false;
 
-  updatePrice(); 
+      trayLabels.forEach(function (label) {
+        var input = label.querySelector("input");
+        if (!input) return;
+        var max = maxTrays(input.value);
+        var badge = badges[input.value];
+        var out = max === 0;
+        if (!out) anyAvailable = true;
+
+        input.disabled = out;
+        label.classList.toggle("disabled", out);
+        if (badge) {
+          badge.textContent = max === Infinity ? "" : (out ? "Out of stock" : max + (max === 1 ? " tray available" : " trays available"));
+        }
+      });
+
+      // The chosen tray ran out: move to the first one that still has stock.
+      var cur = selectedTray();
+      if (cur && maxTrays(cur) === 0) {
+        selectTray(null);
+        cur = null;
+      }
+      if (!cur) {
+        for (var i = 0; i < TRAYS.length; i++) {
+          if (badges[TRAYS[i]] && maxTrays(TRAYS[i]) > 0) { selectTray(TRAYS[i]); cur = TRAYS[i]; break; }
+        }
+      }
+
+      // Quantity can never exceed what is left.
+      var qty = parseInt(qtyInput.value, 10) || 1;
+      var max = cur ? maxTrays(cur) : 0;
+      if (max !== Infinity && qty > max) qty = Math.max(1, max);
+      qtyInput.value = qty;
+      plusBtn.disabled = !cur || (max !== Infinity && qty >= max);
+      minusBtn.disabled = qty <= 1;
+
+      // Add to cart button
+      if (hasStockInfo() && !anyAvailable) {
+        addBtn.disabled = true;
+        addBtn.classList.add("disabled");
+        addBtn.textContent = "Out of stock";
+        addBtn.style.cursor = "not-allowed";
+        note.className = "small mt-2 text-danger";
+        var inCart = eggsInCart();
+        note.textContent = inCart > 0
+          ? "No more trays available: everything in stock for this size is already in your cart."
+          : "Sorry, " + product.title + " eggs are out of stock right now.";
+      } else {
+        addBtn.disabled = false;
+        addBtn.classList.remove("disabled");
+        addBtn.textContent = "Add to Cart";
+        addBtn.style.cursor = "";
+        if (hasStockInfo() && cur) {
+          note.className = "small mt-2 text-muted";
+          var m = maxTrays(cur);
+          note.textContent = "You can order up to " + m + " " + cur + "-egg tray" + (m === 1 ? "" : "s") +
+            (eggsInCart() > 0 ? " more (some are already in your cart)." : ".");
+        } else {
+          note.textContent = "";
+        }
+      }
+      updatePrice();
+    }
+
+    minusBtn.addEventListener("click", function () {
+      var current = parseInt(qtyInput.value, 10);
+      if (current > 1) {
+        qtyInput.value = current - 1;
+        refreshStock();
+      }
+    });
+
+    plusBtn.addEventListener("click", function () {
+      var tray = selectedTray();
+      var current = parseInt(qtyInput.value, 10);
+      if (tray && current >= maxTrays(tray)) return;
+      qtyInput.value = current + 1;
+      refreshStock();
+    });
+
+    trayLabels.forEach(function (label) {
+      label.addEventListener("click", function () {
+        // Bootstrap toggles the radio after the click; wait for it, then re-check limits.
+        setTimeout(refreshStock, 0);
+      });
+    });
+
+    // ---- 5. Add to cart (saved in the browser, read by cart.html) ----
+    addBtn.addEventListener("click", function () {
+      if (addBtn.disabled) return;
+      var tray = selectedTray();
+      if (!tray) {
+        alert("Please choose a tray size first.");
+        return;
+      }
+      var qty = parseInt(qtyInput.value, 10) || 1;
+
+      // Re-check with the very latest stock, so nobody adds trays that were just taken.
+      addBtn.disabled = true;
+      fetchProducts().then(function () {
+        if (products[sizeKey]) product = products[sizeKey];
+        refreshStock();                      // redraws, and re-enables the button if still in stock
+        if (qty > maxTrays(tray)) {
+          alert("Stock just changed: only " + maxTrays(tray) + " " + tray + "-egg tray(s) can be ordered now. Please adjust your quantity.");
+          return;
+        }
+
+        var id = sizeKey + "-" + tray;
+        var cart = loadCart();
+        var existing = cart.filter(function (item) { return item.id === id; })[0];
+
+        if (existing) {
+          existing.qty += qty;
+          existing.unitPrice = product.prices[tray];
+        } else {
+          cart.push({
+            id: id,
+            size: sizeKey,
+            title: product.title,
+            image: product.image,
+            tray: parseInt(tray, 10),
+            unitPrice: product.prices[tray],
+            qty: qty
+          });
+        }
+
+        try {
+          localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        } catch (err) {
+          alert("Sorry, your cart could not be saved in this browser.");
+          return;
+        }
+
+        window.location.href = "cart.html";
+      });
+    });
+
+    // ---- 6. Keep stock live while the page is open ----
+    function poll() {
+      fetchProducts().then(function (ok) {
+        if (ok && products[sizeKey]) {
+          product = products[sizeKey];
+          refreshStock();
+        }
+      });
+    }
+    setInterval(poll, POLL_MS);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) poll();
+    });
+
+    refreshStock();
+  }
 });

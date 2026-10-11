@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+require __DIR__ . '/includes/config.php';
+
+$u = current_user();
+header('Cache-Control: no-store');
+json_out($u
+    ? ['loggedIn' => true, 'name' => $u['name'], 'role' => $u['role']]
+    : ['loggedIn' => false]
+);
