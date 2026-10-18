@@ -1,0 +1,114 @@
+body {
+    background-color: #f4efe6;
+    padding-bottom: 60px;
+}
+
+.back-btn {
+    color: #4a3525;
+    background: transparent;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 5px 0;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    color: #e69500;
+    text-decoration: none;
+}
+
+/* Customer details form — same look as customer-orders.html */
+.customer-details-card {
+    max-width: 1160px;
+    padding: 1.25rem;
+    border: 2px solid #212529;
+    background-color: whitesmoke;
+}
+
+.customer-details-card .form-row {
+    max-width: 780px;
+}
+
+.customer-details-card .col-form-label {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.btn-confirm {
+    border-color: #044ce6;
+    border-radius: 1.5rem;
+    background-color: #044ce6;
+    color: #fff;
+}
+
+.btn-confirm:hover,
+.btn-confirm:focus {
+    border-color: #0034a3;
+    background-color: #0034a3;
+    color: #fff;
+    transition: all 0.5s;
+}
+
+.btn-edit {
+    border: 1px solid lightblue;
+    border-radius: 1.5rem;
+    background-color: lightblue;
+    color: #fff;
+}
+
+.btn-edit:hover,
+.btn-edit:focus {
+    border-color: lightblue;
+    background-color: lightblue;
+}
+
+.info-box {
+    background-color: #f4efe6;
+    border-left: 4px solid #e69500;
+    padding: 15px 20px;
+    border-radius: 0 8px 8px 0;
+    max-width: 780px;
+}
+
+.info-text {
+    font-size: 1rem;
+    color: #4a3525;
+    margin: 0;
+    font-weight: 500;
+}
+
+.action-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+}
+
+.btn-finalize {
+    background-color: #e69500;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 40px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 2px solid #e69500;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(230, 149, 0, 0.2);
+}
+
+.btn-finalize:hover {
+    background-color: #cc8400;
+    border-color: #cc8400;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 15px rgba(230, 149, 0, 0.3);
+}
+
+.return-text {
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-style: italic;
+}

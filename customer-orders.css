@@ -1,0 +1,216 @@
+body {
+    min-height: 100vh;
+    background-color: #f4f6f9;
+    color: #212529;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar{
+  transition: all 0.3s;
+}
+
+.navbar{
+  background: #4a3525;
+  border-bottom: 1px solid #37261a;
+}
+
+.nav-link {
+  color: #fcf8ee;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 1em;
+}
+
+.nav-link:hover {
+  color: #e69500;
+}
+
+.nav-outline-text{
+  -webkit-text-stroke: 0.2px black
+}
+
+.nav-login-btn {
+  color: #4a3525;
+  background-color: #e69500;
+  border: 1px solid #e69500;
+  font-weight: 600;
+  -webkit-text-stroke: 0.2px black;
+  padding: 0.375rem 1.25rem;
+  border-radius: 4px;
+  margin-left: 0.5em;
+}
+
+.nav-login-btn:hover {
+  background-color: #cc8400;
+  border-color: #cc8400;
+  color: #ffffff;
+}
+
+.navbar-collapse {
+  justify-content: flex-end;
+}
+
+.customer-details-card {
+    max-width: 1160px;
+    padding: 1.25rem;
+    border: 2px solid #212529;
+    background-color: whitesmoke;
+}
+
+.customer-details-card .form-row {
+    max-width: 780px;
+}
+
+.customer-details-card .col-form-label {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.btn-confirm {
+    border-color: #044ce6;
+    border-radius: 1.5rem;
+    background-color: #044ce6;
+    color: #fff;
+    
+}
+
+.btn-confirm:hover,
+.btn-confirm:focus {
+    border-color: #0034a3;
+    background-color: #0034a3;
+    color: #fff;
+    transition: all 0.5s;
+}
+
+.btn-edit{
+    border: 1px solid lightblue;
+    border-radius: 1.5rem;
+    background-color: lightblue;
+    color: #fff;
+}
+
+.btn-edit:hover,
+.btn-edit:focus{
+    border-color: lightblue;
+    background-color: lightblue;
+}
+
+.order-history-table {
+    min-width: 760px;
+    background-color: #fff;
+}
+
+.order-history-table th,
+.order-history-table td {
+    text-align: left;
+    vertical-align: middle;
+}
+
+.order-history-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.btn-cancel {
+    min-width: 100px;
+    border-radius: 1.5rem;
+}
+
+#loginModal .modal-content {
+    background-color: #f4efe6;
+    border: 1px solid #37261a;
+    border-radius: 8px;
+    color: #2b1e16;
+}
+
+#loginModal .modal-header {
+    background-color: #4a3525;
+    color: #fcf8ee;
+    border-bottom: 1px solid #37261a;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+
+#loginModal .modal-header .close {
+    color: #fcf8ee;
+    opacity: 0.8;
+    text-shadow: none;
+}
+
+#loginModal .modal-header .close:hover {
+    color: #e69500;
+    opacity: 1;
+}
+
+#loginModal .modal-title {
+    font-weight: 700;
+    color: #fcf8ee;
+}
+
+#loginModal .modal-body label {
+    font-weight: 600;
+    color: #4a3525;
+}
+
+#loginModal .modal-body .form-control {
+    border: 1px solid #b8a695;
+    background-color: #ffffff;
+    border-radius: 4px;
+}
+
+#loginModal .modal-body .form-control:focus {
+    border-color: #e69500;
+    box-shadow: 0 0 0 0.2rem rgba(230, 149, 0, 0.25);
+}
+
+#loginModal .modal-body .btn-primary {
+    background-color: #e69500;
+    border-color: #e69500;
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+#loginModal .modal-body .btn-primary:hover,
+#loginModal .modal-body .btn-primary:focus {
+    background-color: #cc8400;
+    border-color: #cc8400;
+    color: #ffffff;
+}
+
+#loginModal .modal-footer {
+    background-color: #eae1d2;
+    border-top: 1px solid #b8a695;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+#loginModal .modal-footer a {
+    color: #2e5016;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+#loginModal .modal-footer a:hover {
+    color: #e69500;
+    text-decoration: underline;
+}
+
+@media (max-width: 575.98px) {
+    .customer-navbar {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+
+    .customer-navbar .nav-link {
+        margin-left: 0;
+    }
+
+    .cart-link {
+        margin: 0.5rem 0;
+    }
+
+    .customer-details-card {
+        padding: 1rem;
+    }
+}

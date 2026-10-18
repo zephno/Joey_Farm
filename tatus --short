@@ -1,0 +1,59 @@
+ AboutUs-style.css                     |  68 [31m-------[m
+ AboutUs.html                          | 122 [31m------------[m
+ Index.html                            | 205 [31m-------------------[m
+ Order-style.css                       |   8 [31m-[m
+ Order.html                            | 147 [31m--------------[m
+ Product-script.js                     | 322 [31m------------------------------[m
+ Product-style.css                     |  67 [31m-------[m
+ Product.html                          | 126 [31m------------[m
+ README.md                             |   1 [31m-[m
+ api_products.php                      |  27 [31m---[m
+ auth-guard.js                         |  19 [31m--[m
+ cart.css                              | 213 [31m--------------------[m
+ cart.html                             |  61 [31m------[m
+ cart.js                               | 188 [31m------------------[m
+ customer-orders.css                   | 216 [31m--------------------[m
+ customer-orders.html                  | 140 [31m-------------[m
+ customer.js                           |  85 [31m--------[m
+ database_imports/database.sql         |  43 [31m----[m
+ database_imports/orders_inventory.sql |  47 [31m-----[m
+ images/ExtraLarge_Egg.jpg             | Bin [31m89754[m -> [32m0[m bytes
+ images/Jumbo_Egg.jpg                  | Bin [31m75786[m -> [32m0[m bytes
+ images/Large_Egg.jpg                  | Bin [31m82413[m -> [32m0[m bytes
+ images/Medium_Egg.jpg                 | Bin [31m83175[m -> [32m0[m bytes
+ images/Pewee_Egg.jpg                  | Bin [31m67727[m -> [32m0[m bytes
+ images/Picture1.jpg                   | Bin [31m123231[m -> [32m0[m bytes
+ images/Picture2.jpg                   | Bin [31m39383[m -> [32m0[m bytes
+ images/Picture3.jpg                   | Bin [31m62998[m -> [32m0[m bytes
+ images/Small_Egg.jpg                  | Bin [31m79656[m -> [32m0[m bytes
+ images/albertpic.png                  | Bin [31m200180[m -> [32m0[m bytes
+ images/delivery.jpg                   | Bin [31m2558[m -> [32m0[m bytes
+ images/easy.jpg                       | Bin [31m21280[m -> [32m0[m bytes
+ images/jarredpic.png                  | Bin [31m197809[m -> [32m0[m bytes
+ images/logo.png                       | Bin [31m2541670[m -> [32m0[m bytes
+ images/marcopic.jpg                   | Bin [31m35616[m -> [32m0[m bytes
+ images/neilpic.jpg                    | Bin [31m36698[m -> [32m0[m bytes
+ images/paolopic.png                   | Bin [31m426729[m -> [32m0[m bytes
+ images/roaming.jpg                    | Bin [31m7728[m -> [32m0[m bytes
+ includes/config.php                   | 136 [31m-------------[m
+ includes/layout.php                   |  51 [31m-----[m
+ includes/stock.php                    |  36 [31m----[m
+ inventory.php                         |  41 [31m----[m
+ login.php                             |  75 [31m-------[m
+ logout.php                            |  11 [31m-[m
+ main.css                              | 311 [31m-----------------------------[m
+ main.js                               |  56 [31m------[m
+ navbar.css                            |  71 [31m-------[m
+ order-products.js                     | 101 [31m----------[m
+ order_finalize.css                    | 114 [31m-----------[m
+ order_finalize.html                   | 101 [31m----------[m
+ orders-customer.js                    | 138 [31m-------------[m
+ orders.php                            | 273 [31m-------------------------[m
+ register.php                          |  78 [31m--------[m
+ session.php                           |  10 [31m-[m
+ staff-products.php                    | 158 [31m---------------[m
+ staff-users.php                       | 178 [31m-----------------[m
+ staff.css                             | 147 [31m--------------[m
+ staff.html                            | 364 [31m----------------------------------[m
+ staff.js                              | 293 [31m---------------------------[m
+ 58 files changed, 4848 deletions(-)
