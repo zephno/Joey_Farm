@@ -36,33 +36,33 @@
 
         <h1 class="account-page-title text-center mx-auto mt-1 mb-4">My Account</h1>
 
-        <div class="customer-details-card mx-auto mb-4">
+        <div class="customer-details-card mx-auto mb-4" style="max-width: 705px;">
             <h2 id="customer-details-heading" class="mb-4">Customer details</h2>
 
             <form id="customer-details-form">
                 <div class="form-row align-items-center mb-3">
                     <label class="col-12 col-sm-3 col-md-2 col-form-label" for="customer-address">Address:</label>
-                    <div class="col-12 col-sm-9 col-md-6">
+                    <div class="col-12 col-sm-9 col-md-10">
                         <input id="customer-address" name="address" class="form-control" type="text" placeholder="Enter address" required>
                     </div>
                 </div>
 
                 <div class="form-row align-items-center mb-3">
                     <label class="col-12 col-sm-3 col-md-2 col-form-label" for="customer-name">Name:</label>
-                    <div class="col-12 col-sm-9 col-md-6">
+                    <div class="col-12 col-sm-9 col-md-10">
                         <input id="customer-name" name="name" class="form-control" type="text" placeholder="Enter full name" required>
                     </div>
                 </div>
 
                 <div class="form-row align-items-center">
                     <label class="col-12 col-sm-3 col-md-2 col-form-label" for="customer-contact">Contact No.:</label>
-                    <div class="col-12 col-sm-9 col-md-6">
+                    <div class="col-12 col-sm-9 col-md-10">
                         <input id="customer-contact" name="contact" class="form-control" type="tel" placeholder="Enter 8-digit contact number (e.g. 12345678)" pattern="[0-9]{8}" maxlength="8" inputmode="numeric" title="Enter exactly 8 digits (e.g. 12345678)" required>
                     </div>
                 </div>
 
-                <div class="form-row mt-3">
-                    <div class="col-12 col-sm-9 col-md-6 offset-sm-3 offset-md-2">
+                <div class="form-row mt-3" style="max-width: none;">
+                    <div class="col-12 text-right">
                         <button class="btn btn-confirm" type="submit">Submit details</button>
                     </div>
                 </div>
