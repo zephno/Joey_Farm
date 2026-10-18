@@ -46,52 +46,6 @@ $(document).ready(function(){
     $('#loginModal').modal('show');
   }
 
-  // Index.html is shared by guests and signed-in customers. Keep the customer
-  // session visible in its navigation instead of showing the guest Login link.
-  if (document.getElementById('main-navigation-menu')) {
-    fetch('session.php', { credentials: 'same-origin', cache: 'no-store' })
-      .then(function (response) {
-        if (!response.ok) throw new Error('Could not check the login session.');
-        return response.json();
-      })
-      .then(function (session) {
-        if (!session.loggedIn || session.role !== 'customer') return;
-
-        var nav = document.getElementById('main-navigation-menu');
-        var loginItem = nav.querySelector('.nav-login-btn');
-        if (loginItem) loginItem.closest('.nav-item').remove();
-
-        function addNavItem(label, href, className, title) {
-          var item = document.createElement('li');
-          item.className = 'nav-item';
-          var link = document.createElement('a');
-          link.className = className;
-          link.href = href;
-          link.textContent = label;
-          if (title) link.title = title;
-          item.appendChild(link);
-          nav.appendChild(item);
-        }
-
-        addNavItem('Profile', 'customer-orders.html', 'nav-link nav-outline-text');
-        addNavItem('Order', 'Order.html', 'nav-link nav-outline-text');
-        addNavItem('Logout', 'logout.php', 'btn nav-login-btn');
-        addNavItem('🛒', 'cart.html', 'cart-icon-circle text-dark', 'Cart');
-
-        var orderButton = document.getElementById('order-now-button');
-        if (orderButton) {
-          orderButton.removeAttribute('data-toggle');
-          orderButton.removeAttribute('data-target');
-          orderButton.addEventListener('click', function () {
-            window.location.href = 'Order.html';
-          });
-        }
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
-  }
-
   $(window).scroll(function() {
     if ($(window).scrollTop() >= 56) {
       $('.navbar').addClass('navbar-scrolled');

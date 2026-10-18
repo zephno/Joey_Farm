@@ -50,6 +50,10 @@ body {
   justify-content: flex-end;
 }
 
+.account-page-title {
+    max-width: 1160px;
+}
+
 .customer-details-card {
     max-width: 1160px;
     padding: 1.25rem;
