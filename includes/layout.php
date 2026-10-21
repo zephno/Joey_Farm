@@ -26,6 +26,7 @@ function staff_header(string $title, string $active): void
             <?= $link('staff.html', 'Home', 'home') ?>
             <?= $link('staff.html#inventory-section', 'Inventory', 'inventory') ?>
             <?= $link('staff.html#orders-section', 'Orders', 'orders') ?>
+            <?= $link('staff.html#messages-section', 'Messages', 'messages') ?>
             <?= $link('staff-products.php', 'Products', 'products') ?>
             <?= $link('staff-users.php', 'Users', 'users') ?>
             <li class="nav-item"><a class="btn nav-login-btn" href="logout.php">Logout</a></li>
