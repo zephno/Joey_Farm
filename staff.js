@@ -116,6 +116,107 @@ $(document).ready(function () {
         }).catch(showError);
     }
 
+    /* ------------------------------------------------------------------
+       CUSTOMER MESSAGES
+       ------------------------------------------------------------------ */
+    var contactMessages = [];
+    var messageFilter = 'all';
+    var activeContactMessageId = null;
+
+    function renderMessages() {
+        var visibleMessages = contactMessages.filter(function (message) {
+            return messageFilter === 'all' || message.status === messageFilter;
+        });
+        var $tbody = $('#contact-messages-table tbody').empty();
+
+        visibleMessages.forEach(function (message) {
+            var $row = $('<tr>').attr('data-id', message.id);
+            $row.append($('<td>').text(message.sender_name));
+            $row.append($('<td>').text(message.sender_email));
+            $row.append($('<td>').text(message.created_at));
+            $row.append($('<td>').append(
+                $('<span>').addClass('badge px-3 py-2 ' +
+                    (message.status === 'unread' ? 'badge-primary' :
+                        message.status === 'archived' ? 'badge-secondary' : 'badge-success'))
+                    .text(message.status.charAt(0).toUpperCase() + message.status.slice(1))
+            ));
+            $row.append($('<td>').text(message.message.length > 100
+                ? message.message.slice(0, 100) + '…'
+                : message.message));
+            $row.append($('<td>').append(
+                $('<button type="button">').addClass('btn btn-outline-primary btn-sm btn-view-message')
+                    .attr('data-message-id', message.id).text('View')
+            ));
+            $tbody.append($row);
+        });
+
+        $('#messages-empty').prop('hidden', visibleMessages.length !== 0);
+    }
+
+    function refreshMessages() {
+        return api('contact_messages.php').then(function (res) {
+            contactMessages = res.messages;
+            $('#messages-error').prop('hidden', true).text('');
+            renderMessages();
+            if (activeContactMessageId !== null) {
+                showContactMessage(activeContactMessageId);
+            }
+        }).catch(function (err) {
+            $('#messages-error').prop('hidden', false).text(err.message || 'Could not load messages.');
+        });
+    }
+
+    function showContactMessage(id) {
+        var message = contactMessages.find(function (item) {
+            return String(item.id) === String(id);
+        });
+        if (!message) return;
+
+        activeContactMessageId = message.id;
+        $('#message-sender').text(message.sender_name);
+        $('#message-email').text(message.sender_email);
+        $('#message-date').text(message.created_at);
+        $('#message-content').text(message.message);
+        $('#message-status').text(message.status.charAt(0).toUpperCase() + message.status.slice(1));
+        $('#message-action-error').prop('hidden', true).text('');
+        $('.message-mark-read').prop('hidden', message.status !== 'unread');
+        $('.message-archive').prop('hidden', message.status === 'archived');
+        $('#contactMessageModal').modal('show');
+    }
+
+    function updateContactMessage(action) {
+        if (activeContactMessageId === null) return;
+        api('contact_messages.php', { action: action, id: activeContactMessageId })
+            .then(refreshMessages)
+            .catch(function (err) {
+                $('#message-action-error').prop('hidden', false)
+                    .text(err.message || 'Could not update the message.');
+            });
+    }
+
+    $(document).on('click', '.message-filter', function () {
+        messageFilter = $(this).data('filter');
+        $('.message-filter').removeClass('active');
+        $(this).addClass('active');
+        renderMessages();
+    });
+
+    $(document).on('click', '.btn-view-message', function () {
+        showContactMessage($(this).data('message-id'));
+    });
+
+    $('.message-mark-read').on('click', function () {
+        updateContactMessage('mark_read');
+    });
+
+    $('.message-archive').on('click', function () {
+        updateContactMessage('archive');
+    });
+
+    $('#contactMessageModal').on('hidden.bs.modal', function () {
+        activeContactMessageId = null;
+    });
+
     $(document).on('click', '.btn-confirm-order', function () {
         var id = $(this).closest('tr').data('id');
         // Confirming reserves the order's eggs, so refresh the inventory columns too
@@ -160,6 +261,8 @@ $(document).ready(function () {
 
         if (target === 'home-section') {
             refreshOrders();
+        } else if (target === 'messages-section') {
+            refreshMessages();
         }
     });
 
@@ -285,6 +388,7 @@ $(document).ready(function () {
 
     loadInventory();
     refreshOrders();
+    refreshMessages();
 
     const hashTarget = window.location.hash.replace('#', '');
     if (hashTarget) {
