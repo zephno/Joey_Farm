@@ -31,19 +31,32 @@ $(document).ready(function () {
     }
 
     /* ------------------------------------------------------------------
-       ORDERS (loaded from the database)
+       ORDERS FILTERING & DISPLAY
        ------------------------------------------------------------------ */
+    $(document).on('click', '.order-filter', function () {
+        var filter = $(this).data('filter');
+        $('.order-filter').removeClass('active');
+        $(this).addClass('active');
+
+        if (filter === 'all') {
+            $('.order-card-wrapper').show();
+        } else {
+            $('.order-card-wrapper').hide();
+            $('.order-card-wrapper[data-status="' + filter + '"]').show();
+        }
+    });
+
     function baseCells($row, order) {
         $row.attr('data-id', order.id);
         $row.append($('<td>').addClass('details').text(order.details));
-        $row.append($('<td>').addClass('receipt').text(order.receipt));
-        $row.append($('<td>').addClass('amount').text(peso(order.total)));
+        $row.append($('<td>').addClass('receipt font-weight-bold text-secondary').text(order.receipt));
+        $row.append($('<td>').addClass('amount font-weight-bold').text(peso(order.total)));
         $row.append($('<td>').addClass('date').text(order.delivery_date));
     }
 
     function statusBadge(status) {
         var map = {
-            pending:   ['badge-warning', 'Pending'],
+            pending:   ['badge-warning text-dark', 'Pending'],
             confirmed: ['badge-info', 'Confirmed'],
             completed: ['badge-success', 'Delivered'],
             cancelled: ['badge-danger', 'Cancelled']
@@ -53,8 +66,12 @@ $(document).ready(function () {
     }
 
     function cancelBtn() {
-        return $('<button type="button">').addClass('btn btn-danger btn-sm btn-cancel-order ml-2')
-            .css('border-radius', '20px').text('Cancel');
+        return $('<button type="button">').addClass('btn btn-outline-danger btn-sm btn-cancel-order ml-1 rounded-pill')
+            .text('Cancel');
+    }
+
+    function remarkInput(val) {
+        return $('<input type="text" class="table-input remark-field" placeholder="Add a remark">').val(val || '');
     }
 
     function renderOrders(orders) {
@@ -65,43 +82,45 @@ $(document).ready(function () {
         var $cancelled = $('#cancelled-orders-table tbody').empty();
 
         orders.forEach(function (order, index) {
-            // Home tab: most recent 5 orders with their status and next action
+            // Home tab: most recent 5 orders with status, remarks, and actions
             if (index < 5) {
                 var $r = $('<tr>');
                 baseCells($r, order);
                 $r.append($('<td>').append(statusBadge(order.status)));
-                var $act = $('<td>');
+                $r.append($('<td>').append(remarkInput(order.remark)));
+                var $act = $('<td class="text-center">');
                 if (order.status === 'pending') {
-                    $act.append($('<button>').addClass('btn-pill-action btn-confirm-order').text('confirm'))
+                    $act.append($('<button>').addClass('btn btn-sm btn-primary rounded-pill btn-confirm-order px-3').text('Confirm'))
                         .append(cancelBtn());
                 } else if (order.status === 'confirmed') {
-                    $act.append($('<button>').addClass('btn-pill-action btn-complete-order').text('complete'))
+                    $act.append($('<button>').addClass('btn btn-sm btn-success rounded-pill btn-complete-order px-3').text('Complete'))
                         .append(cancelBtn());
                 }
                 $r.append($act);
                 $recent.append($r);
             }
 
-            // Orders tab: one table per status
+            // Orders tab: separate cards/tables per status with dedicated Remarks column
             var $row = $('<tr>');
             baseCells($row, order);
 
             if (order.status === 'pending') {
-                $row.append($('<td>').append($('<button>').addClass('btn-pill-action btn-confirm-order').text('Confirm'))
+                $row.append($('<td>').append($('<button>').addClass('btn btn-sm btn-primary rounded-pill btn-confirm-order px-3').text('Confirm'))
                     .append(cancelBtn()));
+                $row.append($('<td>').append(remarkInput(order.remark)));
                 $pending.append($row);
             } else if (order.status === 'confirmed') {
-                $row.append($('<td>').append($('<button>').addClass('btn-pill-action btn-complete-order').text('Complete'))
+                $row.append($('<td>').append($('<button>').addClass('btn btn-sm btn-success rounded-pill btn-complete-order px-3').text('Complete'))
                     .append(cancelBtn()));
-                $row.append($('<td>').append(
-                    $('<input type="text" class="table-input remark-field" placeholder="Add a remark">').val(order.remark)
-                ));
+                $row.append($('<td>').append(remarkInput(order.remark)));
                 $confirmed.append($row);
             } else if (order.status === 'completed') {
                 $row.append($('<td>').append(statusBadge('completed')));
+                $row.append($('<td>').append(remarkInput(order.remark)));
                 $completed.append($row);
             } else {
                 $row.append($('<td>').append(statusBadge('cancelled')));
+                $row.append($('<td>').append(remarkInput(order.remark)));
                 $cancelled.append($row);
             }
         });
@@ -131,20 +150,20 @@ $(document).ready(function () {
 
         visibleMessages.forEach(function (message) {
             var $row = $('<tr>').attr('data-id', message.id);
-            $row.append($('<td>').text(message.sender_name));
+            $row.append($('<td>').addClass('font-weight-bold').text(message.sender_name));
             $row.append($('<td>').text(message.sender_email));
-            $row.append($('<td>').text(message.created_at));
+            $row.append($('<td>').addClass('text-muted small').text(message.created_at));
             $row.append($('<td>').append(
                 $('<span>').addClass('badge px-3 py-2 ' +
                     (message.status === 'unread' ? 'badge-primary' :
                         message.status === 'archived' ? 'badge-secondary' : 'badge-success'))
                     .text(message.status.charAt(0).toUpperCase() + message.status.slice(1))
             ));
-            $row.append($('<td>').text(message.message.length > 100
-                ? message.message.slice(0, 100) + '…'
+            $row.append($('<td>').text(message.message.length > 80
+                ? message.message.slice(0, 80) + '…'
                 : message.message));
-            $row.append($('<td>').append(
-                $('<button type="button">').addClass('btn btn-outline-primary btn-sm btn-view-message')
+            $row.append($('<td class="text-center">').append(
+                $('<button type="button">').addClass('btn btn-outline-primary btn-sm rounded-pill px-3 btn-view-message')
                     .attr('data-message-id', message.id).text('View')
             ));
             $tbody.append($row);
@@ -219,7 +238,6 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-confirm-order', function () {
         var id = $(this).closest('tr').data('id');
-        // Confirming reserves the order's eggs, so refresh the inventory columns too
         api('orders.php', { action: 'confirm', id: id }).then(function () {
             return Promise.all([refreshOrders(), loadInventory()]);
         }).catch(showError);
@@ -229,7 +247,6 @@ $(document).ready(function () {
         var $tr = $(this).closest('tr');
         var id = $tr.data('id');
         if (!window.confirm('Cancel order ' + ($tr.find('.receipt').text() || '') + '? This cannot be undone.')) return;
-        // A cancelled confirmed order releases its reserved eggs, so reload inventory too
         api('orders.php', { action: 'cancel', id: id }).then(function () {
             return Promise.all([refreshOrders(), loadInventory()]);
         }).catch(showError);
@@ -237,7 +254,6 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-complete-order', function () {
         var id = $(this).closest('tr').data('id');
-        // Completing an order removes its eggs from inventory on the server, so reload both
         api('orders.php', { action: 'complete', id: id }).then(function () {
             return Promise.all([refreshOrders(), loadInventory()]);
         }).catch(showError);
@@ -249,7 +265,7 @@ $(document).ready(function () {
     });
 
     /* ------------------------------------------------------------------
-       TABS
+       NAVIGATION / TABS
        ------------------------------------------------------------------ */
     $('.nav-link').on('click', function (e) {
         const target = $(this).data('target');
@@ -272,37 +288,47 @@ $(document).ready(function () {
     });
 
     /* ------------------------------------------------------------------
-       INVENTORY (loaded from and saved to the database)
+       INVENTORY & SEPARATE BROKEN EGGS SECTION
        ------------------------------------------------------------------ */
     function updateInventoryTotals() {
+        var grandTotalBroken = 0;
+
+        // Process Main Inventory Table
         $('#inventory-table tbody tr').each(function () {
             const $traySelect = $(this).find('.tray-select');
             const traySize = parseInt($traySelect.val(), 10) || 36;
 
             const fresh = parseInt($(this).find('.fresh-qty').val(), 10) || 0;
-            const expiry = parseInt($(this).find('.expiry-qty').val(), 10) || 0;
-            const broken = parseInt($(this).find('.broken-qty').val(), 10) || 0;
-
-            // Stock is counted in EGGS. Only FRESH eggs count towards the totals:
-            // near-expiry and unsellable eggs are tracked in their own columns but
-            // are left out of Total Egg Qty, trays, loose eggs and value.
-            // The tray size only changes how many trays those eggs make up.
             const totalEggs = fresh;
-            const totalTrays = Math.floor(totalEggs / traySize);   // whole trays only
-            const looseEggs = totalEggs % traySize;                // eggs left over, not in a full tray
+            const totalTrays = Math.floor(totalEggs / traySize);
+            const looseEggs = totalEggs % traySize;
 
             $(this).find('.total-trays').val(totalTrays);
             $(this).find('.loose-eggs').val(looseEggs);
             $(this).find('.total-eggs').val(totalEggs);
 
-            // Reserved = eggs in Confirmed (not yet completed) orders; Available = what customers can still order
             const reserved = parseInt($(this).data('reserved'), 10) || 0;
             $(this).find('.reserved-eggs').val(reserved);
             $(this).find('.available-eggs').val(Math.max(0, fresh - reserved));
         });
+
+        // Process Broken Eggs Table
+        $('#broken-eggs-table tbody tr').each(function () {
+            const brokenEggs = parseInt($(this).find('.broken-qty').val(), 10) || 0;
+            grandTotalBroken += brokenEggs;
+
+            // Match tray configuration from corresponding size in inventory table
+            const size = $(this).data('egg-size');
+            const $mainRow = $('#inventory-table tbody tr').filter(function() { return $(this).data('egg-size') === size; });
+            const traySize = parseInt($mainRow.find('.tray-select').val(), 10) || 36;
+
+            const equivTrays = (brokenEggs / traySize).toFixed(1);
+            $(this).find('.broken-trays-text').text(equivTrays + ' Trays (' + traySize + '/tray)');
+        });
+
+        $('#total-broken-badge').text(grandTotalBroken.toLocaleString() + ' Broken Eggs Total');
     }
 
-    // "Extra Large" in the HTML -> "extralarge" in the database
     function sizeKey($row) {
         return String($row.data('egg-size')).toLowerCase().replace(/\s+/g, '');
     }
@@ -310,13 +336,18 @@ $(document).ready(function () {
     function loadInventory() {
         return api('inventory.php').then(function (res) {
             res.rows.forEach(function (r) {
-                var $row = $('#inventory-table tbody tr').filter(function () { return sizeKey($(this)) === r.size_key; });
-                if (!$row.length) return;
-                $row.find('.tray-select').val(String(r.tray_size));
-                $row.find('.fresh-qty').val(r.fresh);
-                $row.find('.expiry-qty').val(r.near_expiry);
-                $row.find('.broken-qty').val(r.unsellable);
-                $row.data('reserved', r.reserved || 0);
+                var $mainRow = $('#inventory-table tbody tr').filter(function () { return sizeKey($(this)) === r.size_key; });
+                if ($mainRow.length) {
+                    $mainRow.find('.tray-select').val(String(r.tray_size));
+                    $mainRow.find('.fresh-qty').val(r.fresh);
+                    $mainRow.find('.expiry-qty').val(r.near_expiry);
+                    $mainRow.data('reserved', r.reserved || 0);
+                }
+
+                var $brokenRow = $('#broken-eggs-table tbody tr').filter(function () { return sizeKey($(this)) === r.size_key; });
+                if ($brokenRow.length) {
+                    $brokenRow.find('.broken-qty').val(r.unsellable);
+                }
             });
             updateInventoryTotals();
         }).catch(showError);
@@ -329,63 +360,40 @@ $(document).ready(function () {
     function saveInventoryRow($row) {
         var key = sizeKey($row);
         clearTimeout(saveTimers[key]);
-        $invStatus.text('Saving…');
+        $invStatus.text('Saving changes…');
+
+        var $mainRow = $('#inventory-table tbody tr').filter(function () { return sizeKey($(this)) === key; });
+        var $brokenRow = $('#broken-eggs-table tbody tr').filter(function () { return sizeKey($(this)) === key; });
+
         saveTimers[key] = setTimeout(function () {
             api('inventory.php', {
                 size_key: key,
-                tray_size: parseInt($row.find('.tray-select').val(), 10),
-                fresh: Math.max(0, parseInt($row.find('.fresh-qty').val(), 10) || 0),
-                near_expiry: Math.max(0, parseInt($row.find('.expiry-qty').val(), 10) || 0),
-                unsellable: Math.max(0, parseInt($row.find('.broken-qty').val(), 10) || 0)
+                tray_size: parseInt($mainRow.find('.tray-select').val(), 10),
+                fresh: Math.max(0, parseInt($mainRow.find('.fresh-qty').val(), 10) || 0),
+                near_expiry: Math.max(0, parseInt($mainRow.find('.expiry-qty').val(), 10) || 0),
+                unsellable: Math.max(0, parseInt($brokenRow.find('.broken-qty').val(), 10) || 0)
             }).then(function () {
-                $invStatus.text('All changes saved.');
+                $invStatus.text('All stock and broken egg changes saved.');
             }).catch(function (err) {
                 $invStatus.text('Could not save: ' + (err.message || 'error'));
-                loadInventory();   // put the real (saved) numbers back on screen
+                loadInventory();
             });
         }, 500);
     }
 
-    $(document).on('input change', '.fresh-qty, .expiry-qty, .broken-qty, .tray-select', function () {
+    $(document).on('input change', '#inventory-table .fresh-qty, #inventory-table .expiry-qty, #inventory-table .tray-select', function () {
+        updateInventoryTotals();
+        saveInventoryRow($(this).closest('tr'));
+    });
+
+    $(document).on('input change', '#broken-eggs-table .broken-qty', function () {
         updateInventoryTotals();
         saveInventoryRow($(this).closest('tr'));
     });
 
     /* ------------------------------------------------------------------
-       START
+       INITIALIZATION
        ------------------------------------------------------------------ */
-    // Inventory columns are in eggs (the HTML headers still say "Trays")
-    $('#inventory-table thead th').each(function () {
-        $(this).text($(this).text().replace('(Trays)', '(Eggs)'));
-    });
-    $('#inventory-table .fresh-qty, #inventory-table .expiry-qty, #inventory-table .broken-qty').attr({ min: 0, step: 1 });
-
-    // Remove the "Price / Tray" and "Est. Total Value" columns: prices are managed in Product Maintenance
-    $('#inventory-table thead th').filter(function () {
-        var t = $(this).text().trim();
-        return t === 'Price / Tray' || t === 'Est. Total Value';
-    }).remove();
-    $('#inventory-table .price-display, #inventory-table .total-value').closest('td').remove();
-
-    // Add a "Loose Eggs" column right after "Total Trays" (eggs that do not fill a whole tray)
-    if (!$('#inventory-table .loose-eggs').length) {
-        var trayCol = $('#inventory-table thead th').filter(function () { return $(this).text().trim() === 'Total Trays'; });
-        trayCol.after('<th>Loose Eggs</th>');
-        $('#inventory-table tbody tr').each(function () {
-            $(this).find('.total-trays').closest('td')
-                .after('<td><input type="number" class="table-input loose-eggs" value="0" readonly></td>');
-        });
-    }
-
-    // Reserved / Available columns (filled from the server; see updateInventoryTotals)
-    if (!$('#inventory-table .reserved-eggs').length) {
-        $('#inventory-table thead tr').first().append('<th>Reserved (Eggs)</th><th>Available (Eggs)</th>');
-        $('#inventory-table tbody tr').each(function () {
-            $(this).append('<td><input type="number" class="table-input reserved-eggs" value="0" readonly></td>' +
-                           '<td><input type="number" class="table-input available-eggs" value="0" readonly></td>');
-        });
-    }
-
     loadInventory();
     refreshOrders();
     refreshMessages();
