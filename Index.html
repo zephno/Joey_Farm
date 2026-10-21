@@ -117,16 +117,16 @@
     <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">    
       <div class="feature-title">Get in Touch!</div>
       <div class="form-group">
-       <input type="text" class="form-control" placeholder="Name">
+       <input type="text" class="form-control" placeholder="Name" readonly data-toggle="modal" data-target="#loginModal">
       </div>
 
       <div class="form-group">
-       <input type="email" class="form-control" placeholder="Email Address" name="email">
+       <input type="email" class="form-control" placeholder="Email Address" name="email" readonly data-toggle="modal" data-target="#loginModal">
       </div>
       <div class="form-group">
-       <textarea class="form-control" rows="4"></textarea>
+       <textarea class="form-control" rows="4" placeholder="Message" readonly data-toggle="modal" data-target="#loginModal"></textarea>
       </div>
-        <input type="submit" class="btn btn-secondary btn-block" value="Send">        
+        <input type="button" class="btn btn-secondary btn-block" value="Send" data-toggle="modal" data-target="#loginModal">
     </div>
 </div>
 
