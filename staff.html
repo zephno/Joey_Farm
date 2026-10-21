@@ -28,6 +28,9 @@
                     <a class="nav-link nav-outline-text" href="#" data-target="orders-section">Orders</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link nav-outline-text" href="#" data-target="messages-section">Messages</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link nav-outline-text" href="staff-products.php">Products</a>
                 </li>
                 <li class="nav-item">
@@ -352,6 +355,60 @@
 
             </div>
 
+            <!-- CUSTOMER MESSAGES SECTION -->
+            <div id="messages-section" class="tab-content-page">
+                <h2 class="section-title mb-3">Customer messages</h2>
+                <div class="btn-group mb-3" role="group" aria-label="Filter messages">
+                    <button type="button" class="btn btn-outline-secondary message-filter active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-outline-secondary message-filter" data-filter="unread">Unread</button>
+                    <button type="button" class="btn btn-outline-secondary message-filter" data-filter="read">Read</button>
+                    <button type="button" class="btn btn-outline-secondary message-filter" data-filter="archived">Archived</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table wireframe-table" id="contact-messages-table">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>Email</th>
+                                <th>Received</th>
+                                <th>Status</th>
+                                <th>Message preview</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <p id="messages-empty" class="text-muted" hidden>No messages in this view.</p>
+                <div id="messages-error" class="alert alert-danger" role="alert" hidden></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="contactMessageModal" tabindex="-1" role="dialog" aria-labelledby="contactMessageTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="contactMessageTitle">Customer message</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1"><strong>From:</strong> <span id="message-sender"></span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span id="message-email"></span></p>
+                    <p class="mb-3"><strong>Received:</strong> <span id="message-date"></span></p>
+                    <div id="message-content" class="border rounded p-3" style="white-space: pre-wrap; overflow-wrap: anywhere;"></div>
+                    <p class="mt-3 mb-0"><strong>Status:</strong> <span id="message-status"></span></p>
+                    <div id="message-action-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary message-mark-read">Mark as read</button>
+                    <button type="button" class="btn btn-warning message-archive">Archive</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
