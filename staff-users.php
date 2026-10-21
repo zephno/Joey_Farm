@@ -101,7 +101,7 @@ if (isset($_GET['edit'])) {
     $s->execute([(int)$_GET['edit']]);
     $editing = $s->fetch() ?: null;
 }
-if (!empty($_SESSION['old_user'])) {            // re-show values after a failed save
+if (!empty($_SESSION['old_user'])) {
     $editing = $_SESSION['old_user'] + ['id' => 0];
     $editing['id'] = $editing['id'] ?: null;
     unset($_SESSION['old_user']);
@@ -113,66 +113,121 @@ $users = $pdo->query('SELECT id, name, email, role, address, contact, created_at
 
 staff_header('User Maintenance', 'users');
 ?>
-<div class="wireframe-box">
-    <h1 class="section-title"><?= $isEdit ? 'Edit user #' . (int)$editing['id'] : 'Add user' ?></h1>
-    <form method="post" action="staff-users.php">
-        <?= csrf_field() ?>
-        <input type="hidden" name="action" value="<?= $isEdit ? 'edit' : 'add' ?>">
-        <input type="hidden" name="id" value="<?= $isEdit ? (int)$editing['id'] : 0 ?>">
-        <div class="form-row">
-            <div class="form-group col-md-4"><label for="name">Name</label>
-                <input class="form-control" id="name" name="name" value="<?= $v('name') ?>" required></div>
-            <div class="form-group col-md-4"><label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?= $v('email') ?>" required></div>
-            <div class="form-group col-md-4"><label for="role">Role</label>
-                <select class="form-control" id="role" name="role">
-                    <?php foreach (['customer', 'staff'] as $r): ?>
-                        <option value="<?= $r ?>" <?= ($editing['role'] ?? 'customer') === $r ? 'selected' : '' ?>><?= ucfirst($r) ?></option>
-                    <?php endforeach; ?>
-                </select></div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4"><label for="address">Address</label>
-                <input class="form-control" id="address" name="address" value="<?= $v('address') ?>"></div>
-            <div class="form-group col-md-4"><label for="contact">Contact No. (8 digits)</label>
-                <input class="form-control" id="contact" name="contact" maxlength="8" pattern="[0-9]{8}" value="<?= $v('contact') ?>"></div>
-            <div class="form-group col-md-4"><label for="password"><?= $isEdit ? 'New password (leave blank to keep)' : 'Password' ?></label>
-                <input type="password" class="form-control" id="password" name="password" minlength="6" <?= $isEdit ? '' : 'required' ?>></div>
-        </div>
-        <button class="btn-pill-action" type="submit"><?= $isEdit ? 'Save changes' : 'Add user' ?></button>
-        <?php if ($isEdit): ?><a class="btn btn-link" href="staff-users.php">Cancel</a><?php endif; ?>
-    </form>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="section-title mb-1">User Maintenance</h2>
+        <p class="text-muted small mb-0">Manage customer accounts and staff administrative access.</p>
+    </div>
 </div>
 
-<h2 class="section-title">User Maintenance</h2>
-<div class="table-responsive">
-    <table class="table wireframe-table">
-        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Address</th><th>Contact</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody>
-        <?php foreach ($users as $u): ?>
-            <tr>
-                <td><?= (int)$u['id'] ?></td>
-                <td><?= e($u['name']) ?></td>
-                <td><?= e($u['email']) ?></td>
-                <td><span class="badge <?= $u['role'] === 'staff' ? 'badge-info' : 'badge-secondary' ?> px-3 py-2"><?= e($u['role']) ?></span></td>
-                <td><?= e($u['address']) ?></td>
-                <td><?= e($u['contact']) ?></td>
-                <td><?= e(substr($u['created_at'], 0, 10)) ?></td>
-                <td>
-                    <a class="btn-pill-action" href="staff-users.php?edit=<?= (int)$u['id'] ?>">Edit</a>
-                    <?php if ((int)$u['id'] !== $me['id']): ?>
-                    <form method="post" action="staff-users.php" class="d-inline"
-                          onsubmit="return confirm('Delete <?= e(addslashes($u['name'])) ?>? This cannot be undone.');">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
-                        <button class="btn btn-danger btn-sm" style="border-radius:20px" type="submit">Delete</button>
-                    </form>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+<div class="card content-card mb-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 font-weight-bold text-dark">
+            <i class="fas fa-user-cog text-primary mr-2"></i><?= $isEdit ? 'Edit User #' . (int)$editing['id'] : 'Add New User Account' ?>
+        </h5>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="staff-users.php">
+            <?= csrf_field() ?>
+            <input type="hidden" name="action" value="<?= $isEdit ? 'edit' : 'add' ?>">
+            <input type="hidden" name="id" value="<?= $isEdit ? (int)$editing['id'] : 0 ?>">
+            
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="name">Name</label>
+                    <input class="form-control table-input" id="name" name="name" value="<?= $v('name') ?>" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="email">Email Address</label>
+                    <input type="email" class="form-control table-input" id="email" name="email" value="<?= $v('email') ?>" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="role">Role</label>
+                    <select class="form-control table-input" id="role" name="role">
+                        <?php foreach (['customer', 'staff'] as $r): ?>
+                            <option value="<?= $r ?>" <?= ($editing['role'] ?? 'customer') === $r ? 'selected' : '' ?>><?= ucfirst($r) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="address">Address</label>
+                    <input class="form-control table-input" id="address" name="address" value="<?= $v('address') ?>">
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="contact">Contact No. (8 digits)</label>
+                    <input class="form-control table-input" id="contact" name="contact" maxlength="8" pattern="[0-9]{8}" value="<?= $v('contact') ?>">
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="font-weight-bold" for="password"><?= $isEdit ? 'New Password (optional)' : 'Password' ?></label>
+                    <input type="password" class="form-control table-input" id="password" name="password" minlength="6" <?= $isEdit ? '' : 'required' ?>>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <button class="btn btn-primary rounded-pill px-4" type="submit">
+                    <i class="fas <?= $isEdit ? 'fa-save' : 'fa-user-plus' ?> mr-1"></i><?= $isEdit ? 'Save Changes' : 'Add User' ?>
+                </button>
+                <?php if ($isEdit): ?>
+                    <a class="btn btn-outline-secondary rounded-pill px-4 ml-2" href="staff-users.php">Cancel</a>
+                <?php endif; ?>
+            </div>
+        </form>
+    </div>
 </div>
-<?php staff_footer();
+
+<div class="card content-card">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 font-weight-bold text-dark"><i class="fas fa-users mr-2 text-primary"></i>User Directory</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table custom-table mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Address</th>
+                        <th>Contact</th>
+                        <th>Joined</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($users as $u): ?>
+                    <tr>
+                        <td class="font-weight-bold text-secondary"><?= (int)$u['id'] ?></td>
+                        <td class="font-weight-bold"><?= e($u['name']) ?></td>
+                        <td><?= e($u['email']) ?></td>
+                        <td>
+                            <span class="badge <?= $u['role'] === 'staff' ? 'badge-info' : 'badge-secondary' ?> px-3 py-2">
+                                <?= ucfirst(e($u['role'])) ?>
+                            </span>
+                        </td>
+                        <td><?= e($u['address']) ?></td>
+                        <td><?= e($u['contact']) ?></td>
+                        <td class="text-muted small"><?= e(substr($u['created_at'], 0, 10)) ?></td>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="staff-users.php?edit=<?= (int)$u['id'] ?>">Edit</a>
+                            <?php if ((int)$u['id'] !== $me['id']): ?>
+                            <form method="post" action="staff-users.php" class="d-inline ml-1"
+                                  onsubmit="return confirm('Delete <?= e(addslashes($u['name'])) ?>? This cannot be undone.');">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="<?= (int)$u['id'] ?>">
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" type="submit">Delete</button>
+                            </form>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php staff_footer(); ?>
