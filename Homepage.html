@@ -123,17 +123,22 @@
   <div class="container features bg-white" id="formDesign">
     <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">    
       <div class="feature-title">Get in Touch!</div>
-      <div class="form-group">
-       <input type="text" class="form-control" placeholder="Name">
-      </div>
-
-      <div class="form-group">
-       <input type="email" class="form-control" placeholder="Email Address" name="email">
-      </div>
-      <div class="form-group">
-       <textarea class="form-control" rows="4"></textarea>
-      </div>
-        <input type="submit" class="btn btn-secondary btn-block" value="Send">        
+      <form id="contactForm">
+        <div class="form-group">
+          <label for="contactName">Name</label>
+          <input type="text" class="form-control contact-field" id="contactName" readonly required>
+        </div>
+        <div class="form-group">
+          <label for="contactEmail">Email Address</label>
+          <input type="email" class="form-control contact-field" id="contactEmail" readonly required>
+        </div>
+        <div class="form-group">
+          <label for="contactMessage">Message</label>
+          <textarea class="form-control contact-field" id="contactMessage" rows="4" maxlength="5000" readonly required></textarea>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-block" id="contactSendButton" disabled>Send</button>
+        <div id="contactStatus" class="mt-3" role="status" aria-live="polite"></div>
+      </form>
     </div>
 </div>
 
