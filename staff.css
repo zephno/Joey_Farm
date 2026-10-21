@@ -3,146 +3,177 @@
   --farm-brown-hover: #542709;
   --btn-purple: #4A47A3;
   --btn-purple-hover: #363482;
-  --border-dark: #000000;
+  --card-bg: #ffffff;
+  --body-bg: #f4f6f9;
+  --border-light: #e3e6f0;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f6f9;
-  color: #212529;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--body-bg);
+  color: #333333;
 }
-
-/* Navbar styling now lives in navbar.css (shared with Index look). */
 
 .main-container {
-  background-color: #ffffff;
-  min-height: calc(100vh - 80px);
-  padding: 2rem;
-  box-shadow: 0 0 15px rgba(0,0,0,0.05);
-}
-
-.wireframe-box {
-  border: 2px solid var(--border-dark);
-  padding: 20px;
-  margin-bottom: 30px;
-  border-radius: 0px;
-  background-color: #ffffff;
+  background-color: transparent;
+  min-height: calc(100vh - 100px);
 }
 
 .section-title {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: -0.3px;
+}
+
+/* Card Styling for Reduced Overload */
+.content-card {
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background-color: #ffffff;
+}
+
+/* Sales Dashboard Metric Cards */
+.sales-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.sales-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.sales-card.accent-card {
+  border-left: 4px solid #28a745;
+}
+
+.sales-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sales-label {
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 12px;
-  color: #000000;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-#home-section .section-title {
-  font-size: 2rem;
+.sales-icon-bg {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
 }
 
-.wireframe-table {
-  border: 2px solid var(--border-dark) !important;
+.sales-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+  letter-spacing: -0.5px;
+}
+
+.sales-subtext {
+  font-size: 0.8rem;
+  color: #a0aec0;
+}
+
+/* Cleaner, Modern Table Design */
+.custom-table {
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
-.wireframe-table th,
-.wireframe-table td {
-  border: 1.5px solid var(--border-dark) !important;
-  text-align: center;
+.custom-table th {
+  background-color: #f8f9fc;
+  color: #4e73df;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light) !important;
+  border-top: none !important;
+  vertical-align: middle;
+}
+
+.custom-table td {
+  padding: 12px 16px;
   vertical-align: middle !important;
-  padding: 8px 10px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f3f9;
+  border-top: none;
 }
 
-.wireframe-table th {
-  font-weight: 600;
-  background-color: #f8f9fa;
-  color: #000000;
+.custom-table tbody tr:hover {
+  background-color: #fcfdfe;
 }
 
 .size-badge {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--farm-brown);
-}
-
-.btn-pill-action {
-  background-color: var(--btn-purple);
-  color: #ffffff !important;
-  border-radius: 20px;
-  padding: 4px 22px;
-  font-size: 0.95rem;
-  border: none;
-  transition: background-color 0.2s ease;
+  background-color: #f7f1eb;
+  padding: 4px 10px;
+  border-radius: 6px;
   display: inline-block;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-
-.btn-pill-action:hover {
-  background-color: var(--btn-purple-hover);
 }
 
 .table-input {
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 5px 8px;
   width: 100%;
-  text-align: center;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
   background-color: #ffffff;
 }
 
 .table-input[readonly] {
-  background-color: #e9ecef;
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #495057;
   font-weight: 600;
 }
 
 .table-input:focus {
   outline: none;
   border-color: var(--btn-purple);
-  box-shadow: 0 0 5px rgba(74, 71, 163, 0.4);
+  box-shadow: 0 0 0 3px rgba(74, 71, 163, 0.15);
 }
 
-.sales-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 30px 15px;
-  background-color: #ffffff;
-  border: 2px solid var(--border-dark);
+.remark-field {
+  min-width: 160px;
+  font-style: italic;
 }
 
-.sales-icon {
-  font-size: 4.5rem;
-  color: #d4af37;
-  margin-bottom: 10px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
-}
-
-.sales-label {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.sales-value {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #2b7a2b;
-  margin-top: 8px;
+.border-danger-subtle {
+  border: 1px solid #f8d7da !important;
 }
 
 .tagalog-note {
-  font-size: 1rem;
-  color: #333333;
-  margin-top: 25px;
-  text-align: center;
-  line-height: 1.5;
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-left: 4px solid var(--farm-brown);
-  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #495057;
+  background-color: #eef2f7;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .tab-content-page {
