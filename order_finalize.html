@@ -69,20 +69,18 @@
                 <div class="form-row align-items-center">
                     <label class="col-12 col-sm-3 col-md-2 col-form-label" for="customer-payment">Payment:</label>
                     <div class="col-12 col-sm-9 col-md-6">
-                        <input id="customer-payment" name="payment" class="form-control" type="text" placeholder="Enter payment method" required>
-                    </div>
-                </div>
-
-                <div class="form-row mt-3">
-                    <div class="col-12 col-sm-9 col-md-6 offset-sm-3 offset-md-2">
-                        <button class="btn btn-confirm" type="submit">Submit details</button>
+                        <select id="customer-payment" name="payment" class="form-control" required>
+                            <option value="" disabled selected>Select payment method</option>
+                            <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                            <option value="GCash">GCash</option>
+                        </select>
                     </div>
                 </div>
             </form>
 
             <div class="info-box mt-4">
                 <p class="info-text">
-                    💡 If you have already saved your details on the homepage, these fields will be auto-filled for your convenience.
+                    📌 If you have already saved your details on the homepage, these fields will be auto-filled for your convenience.
                 </p>
             </div>
 
