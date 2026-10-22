@@ -1,8 +1,251 @@
-.products-title {
-  font-size: 2rem;
-  font-weight: bold;
+/* Color & Token Variables */
+:root {
+  --primary-brown: #4a3525;
+  --dark-brown: #37261a;
+  --accent-gold: #e69500;
+  --accent-gold-hover: #cc8400;
+  --bg-light: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-main: #2b1e16;
+  --text-muted: #6c757d;
+  --border-color: #f0f0f0;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --radius-lg: 12px;
+}
+
+body {
+  background-color: #f9fbfd;
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding-top: 75px; /* Offset for fixed navbar */
+}
+
+/* Navbar Custom Overrides */
+body.has-fixed-nav {
+  padding-top: 56px;
+}
+
+.navbar-solid {
+  background: #4a3525;
+  border-bottom: 1px solid #37261a;
+  transition: all 0.3s;
+}
+
+.navbar-solid .navbar-collapse {
+  justify-content: flex-end;
+}
+
+.navbar-solid .nav-link {
+  color: #fcf8ee;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 1em;
+}
+
+.navbar-solid .nav-link:hover,
+.navbar-solid .nav-link.active {
   color: #e69500;
 }
 
+.navbar-solid .nav-outline-text {
+  -webkit-text-stroke: 0.2px black;
+}
 
+.navbar-solid .nav-login-btn {
+  color: #4a3525;
+  background-color: #e69500;
+  border: 1px solid #e69500;
+  font-weight: 600;
+  -webkit-text-stroke: 0.2px black;
+  padding: 0.375rem 1.25rem;
+  border-radius: 4px;
+  margin-left: 0.5em;
+}
 
+.navbar-solid .nav-login-btn:hover {
+  background-color: #cc8400;
+  border-color: #cc8400;
+  color: #ffffff;
+}
+
+.navbar-solid .cart-icon-circle {
+  background-color: white;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-left: 15px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-solid a.cart-icon-circle {
+  text-decoration: none;
+}
+
+@media (max-width: 767.98px) {
+  .navbar-solid .nav-login-btn {
+    margin-left: 0;
+    margin-top: 0.5em;
+    display: inline-block;
+  }
+}
+
+/* Page Header */
+.products-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--primary-brown);
+  letter-spacing: -0.3px;
+}
+
+.products-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Product Cards */
+.product-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Updated Image Wrapper & Image Fitting */
+.product-img-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: #FAF6EE; /* Clean subtle background matching egg art */
+  height: 220px;            /* Gives enough breathing room for the full graphic */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;             /* Keeps the graphic safely away from card edges */
+}
+
+.product-img-wrapper img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;       /* Displays 100% of the image without cropping or clipping */
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img-wrapper img {
+  transform: scale(1.04);
+}
+
+.card-body {
+  padding: 1.15rem;
+}
+
+.product-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-brown);
+  margin-bottom: 0.4rem;
+}
+
+.product-card-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Simplified Status Badges */
+.stock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0.25em 0.65em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.badge-in-stock {
+  background-color: #28a745;
+  color: #ffffff;
+}
+
+.badge-out-of-stock {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+/* Out of stock card styling */
+.product-card.out-of-stock {
+  opacity: 0.7;
+}
+
+.product-card.out-of-stock .product-img-wrapper img {
+  filter: grayscale(70%);
+}
+
+.stock-breakdown {
+  min-height: 22px;
+}
+
+/* Buttons */
+.btn-order {
+  background-color: var(--accent-gold);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-order:hover,
+.btn-order:focus {
+  background-color: var(--accent-gold-hover);
+  color: #fffcf9;
+  box-shadow: none;
+}
+
+/* Page Footer */
+.page-footer {
+  background-color: var(--primary-brown);
+  color: #fcf8ee;
+  padding-top: 2.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.page-footer h5 {
+  color: var(--accent-gold);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.page-footer p {
+  font-size: 0.875rem;
+  color: #e2d9cc;
+  line-height: 1.5;
+}
+
+.footer-copyright {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  font-size: 0.8rem;
+  color: #b8a695;
+}
