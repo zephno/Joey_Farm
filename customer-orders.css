@@ -1,221 +1,268 @@
+/* Custom Typography & Palette Setup */
+:root {
+    --primary-brown: #4a3525;
+    --dark-brown: #37261a;
+    --accent-gold: #e69500;
+    --accent-gold-hover: #cc8400;
+    --bg-light: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-primary: #2b1e16;
+    --text-muted: #6c757d;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --radius-lg: 12px;
+    --radius-md: 8px;
+}
+
 body {
     min-height: 100vh;
     background-color: #f4f6f9;
-    color: #212529;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 }
 
-.navbar{
-  transition: all 0.3s;
-}
-
-.navbar{
-  background: #4a3525;
-  border-bottom: 1px solid #37261a;
+/* Navbar Enhancements */
+.navbar {
+    background: var(--primary-brown);
+    border-bottom: 1px solid var(--dark-brown);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
 }
 
 .nav-link {
-  color: #fcf8ee;
-  cursor: pointer;
-  font-weight: 600;
-  margin-right: 1em;
+    color: #fcf8ee !important;
+    font-weight: 600;
+    margin-right: 0.75rem;
+    transition: color 0.2s ease;
 }
 
 .nav-link:hover {
-  color: #e69500;
-}
-
-.nav-outline-text{
-  -webkit-text-stroke: 0.2px black
+    color: var(--accent-gold) !important;
 }
 
 .nav-login-btn {
-  color: #4a3525;
-  background-color: #e69500;
-  border: 1px solid #e69500;
-  font-weight: 600;
-  -webkit-text-stroke: 0.2px black;
-  padding: 0.375rem 1.25rem;
-  border-radius: 4px;
-  margin-left: 0.5em;
+    color: #ffffff;
+    background-color: var(--accent-gold);
+    border: none;
+    font-weight: 600;
+    padding: 0.45rem 1.25rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .nav-login-btn:hover {
-  background-color: #cc8400;
-  border-color: #cc8400;
-  color: #ffffff;
+    background-color: var(--accent-gold-hover);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-.navbar-collapse {
-  justify-content: flex-end;
+.cart-icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin-left: 0.75rem;
+    text-decoration: none !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.cart-icon-circle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Account Page Title */
 .account-page-title {
-    max-width: 1160px;
-    text-align: center;
+    font-weight: 700;
+    color: var(--primary-brown);
+    font-size: 2rem;
+    margin-top: 1rem;
+    letter-spacing: -0.5px;
 }
 
-.customer-details-card {
-    max-width: 1160px;
-    padding: 1.25rem;
-    border: 2px solid #212529;
-    background-color: whitesmoke;
+/* Cards & Containers */
+.customer-details-card,
+.order-history-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s ease;
 }
 
-.customer-details-card .form-row {
-    max-width: 780px;
+.customer-details-card:hover,
+.order-history-card:hover {
+    box-shadow: var(--shadow-md);
 }
 
-.customer-details-card .col-form-label {
-    font-size: 18px;
-    font-weight: 500;
+.card-section-title {
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--primary-brown);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
 }
 
+/* Form Styles */
+.form-group label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    border-radius: var(--radius-md);
+    border: 1px solid #ced4da;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 0.2rem rgba(230, 149, 0, 0.2);
+}
+
+/* Locked Form Fields */
+.form-control:read-only {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #495057;
+    cursor: not-allowed;
+}
+
+/* Custom Action Buttons */
 .btn-confirm {
-    border-color: #044ce6;
-    border-radius: 1.5rem;
-    background-color: #044ce6;
-    color: #fff;
-    
+    border: none;
+    border-radius: 20px;
+    background-color: var(--accent-gold);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.5rem 1.75rem;
+    transition: all 0.2s ease;
 }
 
 .btn-confirm:hover,
 .btn-confirm:focus {
-    border-color: #0034a3;
-    background-color: #0034a3;
-    color: #fff;
-    transition: all 0.5s;
+    background-color: var(--accent-gold-hover);
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(230, 149, 0, 0.3);
 }
 
-.btn-edit{
-    border: 1px solid lightblue;
-    border-radius: 1.5rem;
-    background-color: lightblue;
-    color: #fff;
+.btn-edit {
+    border: 1px solid var(--primary-brown);
+    border-radius: 20px;
+    background-color: transparent;
+    color: var(--primary-brown);
+    font-weight: 600;
+    padding: 0.5rem 1.75rem;
+    transition: all 0.2s ease;
 }
 
 .btn-edit:hover,
-.btn-edit:focus{
-    border-color: lightblue;
-    background-color: lightblue;
+.btn-edit:focus {
+    background-color: var(--primary-brown);
+    color: #ffffff;
 }
 
+/* Order History Table */
 .order-history-table {
-    min-width: 760px;
-    background-color: #fff;
-}
-
-.order-history-table th,
-.order-history-table td {
-    text-align: left;
-    vertical-align: middle;
+    margin-bottom: 0;
 }
 
 .order-history-table thead th {
     background-color: #f8f9fa;
-    font-weight: 600;
+    color: var(--primary-brown);
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+    padding: 1rem;
 }
 
+.order-history-table td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.order-history-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.order-history-table tbody tr:hover {
+    background-color: rgba(230, 149, 0, 0.03);
+}
+
+/* Action & Status Badges */
 .btn-cancel {
-    min-width: 100px;
-    border-radius: 1.5rem;
+    min-width: 90px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 1rem;
 }
 
+.badge-status {
+    padding: 0.4em 0.8em;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+.badge-status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-status-delivered {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Modal Improvements */
 #loginModal .modal-content {
-    background-color: #f4efe6;
-    border: 1px solid #37261a;
-    border-radius: 8px;
-    color: #2b1e16;
+    background-color: #ffffff;
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
 }
 
 #loginModal .modal-header {
-    background-color: #4a3525;
-    color: #fcf8ee;
-    border-bottom: 1px solid #37261a;
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
-}
-
-#loginModal .modal-header .close {
-    color: #fcf8ee;
-    opacity: 0.8;
-    text-shadow: none;
-}
-
-#loginModal .modal-header .close:hover {
-    color: #e69500;
-    opacity: 1;
+    background-color: var(--primary-brown);
+    color: #ffffff;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
 }
 
 #loginModal .modal-title {
     font-weight: 700;
-    color: #fcf8ee;
+    font-size: 1.25rem;
 }
 
-#loginModal .modal-body label {
-    font-weight: 600;
-    color: #4a3525;
-}
-
-#loginModal .modal-body .form-control {
-    border: 1px solid #b8a695;
-    background-color: #ffffff;
-    border-radius: 4px;
-}
-
-#loginModal .modal-body .form-control:focus {
-    border-color: #e69500;
-    box-shadow: 0 0 0 0.2rem rgba(230, 149, 0, 0.25);
-}
-
-#loginModal .modal-body .btn-primary {
-    background-color: #e69500;
-    border-color: #e69500;
-    color: #ffffff;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
-}
-
-#loginModal .modal-body .btn-primary:hover,
-#loginModal .modal-body .btn-primary:focus {
-    background-color: #cc8400;
-    border-color: #cc8400;
-    color: #ffffff;
+#loginModal .modal-body {
+    padding: 1.75rem 1.5rem;
 }
 
 #loginModal .modal-footer {
-    background-color: #eae1d2;
-    border-top: 1px solid #b8a695;
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
-}
-
-#loginModal .modal-footer a {
-    color: #2e5016;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-#loginModal .modal-footer a:hover {
-    color: #e69500;
-    text-decoration: underline;
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
 }
 
 @media (max-width: 575.98px) {
-    .customer-navbar {
-        padding-right: 1rem;
-        padding-left: 1rem;
-    }
-
-    .customer-navbar .nav-link {
-        margin-left: 0;
-    }
-
-    .cart-link {
-        margin: 0.5rem 0;
-    }
-
-    .customer-details-card {
-        padding: 1rem;
+    .customer-details-card,
+    .order-history-card {
+        padding: 1.25rem;
     }
 }
