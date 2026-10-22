@@ -2,9 +2,6 @@ $(document).ready(function(){
   var STORAGE_KEY = 'joeysFarmCustomerDetails';
   var $form = $('#customer-details-form');
 
-  // customer-orders.html is the source: whatever is typed there gets saved.
-  // Forms marked data-sync="receive-only" (order_finalize.html) only read the
-  // saved details and never write back, so editing there leaves the source alone.
   var receiveOnly = $form.data('sync') === 'receive-only';
 
   var fields = {
@@ -31,11 +28,10 @@ $(document).ready(function(){
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(details));
     } catch (err) {
-      // storage unavailable (private mode, blocked) - the form still works
+      // storage unavailable
     }
   }
 
-  // Fill the fields from saved details (both pages); fields stay editable.
   var saved = loadSaved();
   Object.keys(fields).forEach(function (key) {
     if (saved[key]) {
@@ -43,7 +39,6 @@ $(document).ready(function(){
     }
   });
 
-  // Save live as the customer types (source page only).
   $form.on('input change', 'input', saveCurrent);
 
   $form.on('submit', function(e){
@@ -52,9 +47,11 @@ $(document).ready(function(){
     var $inputs = $(this).find('input');
     var $button = $(this).find('button[type="submit"]');
 
-    if ($button.text().trim() === 'Edit') {
-      $inputs.prop('readonly', false).removeClass('locked-field');
-      $button.text('Submit details').removeClass('btn-edit').addClass('btn-confirm');
+    if ($button.hasClass('btn-edit')) {
+      $inputs.prop('readonly', false);
+      $button.html('<i class="fas fa-check mr-1"></i> Submit Details')
+             .removeClass('btn-edit')
+             .addClass('btn-confirm');
       return;
     }
 
@@ -71,8 +68,9 @@ $(document).ready(function(){
 
     saveCurrent();
     $inputs.prop('readonly', true);
-    $button.text('Edit').addClass('btn-edit').removeClass('btn-confirm');
-    console.log('Customer details submitted:', details);
+    $button.html('<i class="fas fa-pen mr-1"></i> Edit Details')
+           .addClass('btn-edit')
+           .removeClass('btn-confirm');
   });
 
   $(window).on('scroll', function(){
