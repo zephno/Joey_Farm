@@ -14,11 +14,14 @@
     <nav class="navbar navbar-expand-md fixed-top navbar-solid">
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
           <span class="navbar-toggler-icon"></span>
-        </button>
+        </button>   
         <div class="collapse navbar-collapse" id="main-navigation">
           <ul class="navbar-nav align-items-center">
             <li class="nav-item">
-              <a class="nav-link nav-outline-text" href="customer-orders.html">Home</a>
+              <a class="nav-link nav-outline-text" href="Homepage.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link nav-outline-text" href="customer-orders.html">Profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link nav-outline-text" href="Order.html">Order</a>
@@ -63,14 +66,14 @@
         </div>
 
         <!-- Quantity Picker -->
-        <div class="mb-4">
-            <label class="option-label">Quantity</label>
-            <div class="quantity-picker d-flex align-items-center">
-            <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyMinus">−</button>
-            <input type="text" class="form-control text-center qty-input" id="qtyValue" value="1" readonly>
-            <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyPlus">+</button>
-            </div>
-        </div>
+<div class="mb-4">
+    <label class="option-label">Quantity</label>
+    <div class="quantity-picker d-flex align-items-center">
+        <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyMinus">−</button>
+        <input type="number" class="form-control text-center qty-input" id="qtyValue" value="1" min="1">
+        <button class="btn btn-outline-secondary qty-btn" type="button" id="qtyPlus">+</button>
+    </div>
+</div>
 
         <!-- Price Display -->
         <div class="mb-4">
