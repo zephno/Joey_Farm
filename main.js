@@ -48,6 +48,18 @@ $(document).ready(function(){
 
   var $contactForm = $('#contactForm');
   if ($contactForm.length) {
+    // Every message needs a photo. If the page does not already have the file field,
+    // add it just above the Send button (Homepage.html can also contain it directly).
+    if (!$('#contactImage').length) {
+      $('<div class="form-group">' +
+          '<label for="contactImage">Photo (required)</label>' +
+          '<input type="file" class="form-control-file contact-field" id="contactImage" ' +
+                 'accept="image/jpeg,image/png,image/webp" readonly required>' +
+          '<small class="form-text text-muted">JPG, PNG or WebP. Large photos are shrunk automatically.</small>' +
+        '</div>').insertBefore('#contactSendButton');
+    }
+
+    var MAX_UPLOAD_BYTES = 10 * 1024 * 1024;     // the server accepts up to 2 MB
     var $contactFields = $contactForm.find('.contact-field');
     var $contactStatus = $('#contactStatus');
     var contactSession = fetch('session.php', {
@@ -90,6 +102,38 @@ $(document).ready(function(){
       }
     });
 
+    // Photos from phones are often several MB. Anything big is shrunk in the browser
+    // (longest side 1600 px, JPEG) so it fits the server's 2 MB limit.
+    function preparePhoto(file) {
+      return new Promise(function(resolve, reject) {
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+          reject(new Error('Please attach a JPG, PNG or WebP photo.'));
+          return;
+        }
+        if (file.size <= 1.5 * 1024 * 1024) { resolve(file); return; }
+
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function() {
+          var scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(function(blob) {
+            URL.revokeObjectURL(url);
+            if (blob && blob.size <= MAX_UPLOAD_BYTES) resolve(blob);
+            else reject(new Error('That photo is too large. Please choose a smaller one.'));
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = function() {
+          URL.revokeObjectURL(url);
+          reject(new Error('Could not read that photo. Please choose another one.'));
+        };
+        img.src = url;
+      });
+    }
+
     $contactForm.on('submit', function(event) {
       event.preventDefault();
       contactSession.then(function(isCustomer) {
@@ -98,31 +142,42 @@ $(document).ready(function(){
           return;
         }
 
+        var $status = $contactStatus.removeClass('alert alert-danger alert-success');
+        var photo = $('#contactImage')[0].files[0];
+        if (!photo) {
+          $status.addClass('alert alert-danger').text('Please attach a photo to your message.');
+          return;
+        }
+
         var $button = $('#contactSendButton').prop('disabled', true);
-        $contactStatus.removeClass('alert alert-danger alert-success').text('Sending…');
-        fetch('contact_messages.php', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'create',
-            name: $('#contactName').val(),
-            email: $('#contactEmail').val(),
-            message: $('#contactMessage').val()
-          })
+        $status.text('Sending…');
+
+        preparePhoto(photo).then(function(blob) {
+          var form = new FormData();
+          form.append('action', 'create');
+          form.append('name', $('#contactName').val());
+          form.append('email', $('#contactEmail').val());
+          form.append('message', $('#contactMessage').val());
+          form.append('image', blob, blob === photo ? photo.name : 'photo.jpg');
+
+          // No Content-Type header here: the browser adds the multipart boundary itself.
+          return fetch('contact_messages.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: form
+          });
         }).then(function(response) {
-          return response.json().then(function(data) {
+          return response.json().catch(function() { return {}; }).then(function(data) {
             if (!response.ok) throw new Error(data.error || 'Could not send your message.');
             return data;
           });
         }).then(function() {
           $('#contactMessage').val('');
-          $contactStatus.addClass('alert alert-success').text('Your message has been sent.');
+          $('#contactImage').val('');
+          $status.addClass('alert alert-success').text('Your message has been sent.');
         }).catch(function(error) {
-          $contactStatus.addClass('alert alert-danger')
+          $status.addClass('alert alert-danger')
             .text(error.message || 'Could not send your message.');
         }).then(function() {
           $button.prop('disabled', false);

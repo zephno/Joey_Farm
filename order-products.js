@@ -26,9 +26,11 @@
       return; 
     }
 
-    var totalTrays = (t['12'] || 0) + (t['24'] || 0) + (t['36'] || 0);
+    var t12 = t['12'] || 0, t24 = t['24'] || 0, t36 = t['36'] || 0;
 
-    if (totalTrays === 0) {
+    // The three tray sizes are drawn from the SAME eggs, so they are alternatives, not a sum.
+    // Out of stock only when not even one 12-egg tray can be made.
+    if (t12 + t24 + t36 === 0) {
       c.card.classList.add('out-of-stock');
       c.badge.className = 'stock-badge badge-out-of-stock';
       c.badge.textContent = 'Out of Stock';
@@ -45,9 +47,10 @@
       c.badge.textContent = 'In Stock';
       c.badge.style.display = 'inline-block';
 
-      // Summary tray count text to avoid clutter
+      // One number per tray size, e.g. "Up to 8 × 12-egg, 4 × 24-egg or 2 × 36-egg trays"
       c.stockLine.appendChild(
-        el('small', 'text-muted', totalTrays + (totalTrays === 1 ? ' tray available' : ' trays available'))
+        el('small', 'text-muted',
+          'Up to ' + t12 + ' × 12-egg, ' + t24 + ' × 24-egg or ' + t36 + ' × 36-egg trays')
       );
 
       c.btn.textContent = 'Select Size';

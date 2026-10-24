@@ -132,11 +132,16 @@ document.addEventListener("DOMContentLoaded", function () {
       return !!(product.stock && typeof product.stock.eggs === "number");
     }
 
-    // How many trays of this size the customer can still add right now.
+    // Trays of this tray size in stock: the same number the Order page shows.
     function maxTrays(tray) {
       if (!hasStockInfo()) return Infinity;
-      var left = product.stock.eggs - eggsInCart();
-      return Math.max(0, Math.floor(left / parseInt(tray, 10)));
+      return Math.max(0, Math.floor(product.stock.eggs / parseInt(tray, 10)));
+    }
+
+    // Trays of this size the customer can still ADD, counting what is already in their cart.
+    function canStillAdd(tray) {
+      if (!hasStockInfo()) return Infinity;
+      return Math.max(0, Math.floor((product.stock.eggs - eggsInCart()) / parseInt(tray, 10)));
     }
 
     function selectedTray() {
@@ -209,10 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
         addBtn.textContent = "Out of stock";
         addBtn.style.cursor = "not-allowed";
         note.className = "small mt-2 text-danger";
-        var inCart = eggsInCart();
-        note.textContent = inCart > 0
-          ? "No more trays available: everything in stock for this size is already in your cart."
-          : "Sorry, " + product.title + " eggs are out of stock right now.";
+        note.textContent = "Sorry, " + product.title + " eggs are out of stock right now.";
       } else {
         addBtn.disabled = false;
         addBtn.classList.remove("disabled");
@@ -221,8 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hasStockInfo() && cur) {
           note.className = "small mt-2 text-muted";
           var m = maxTrays(cur);
-          note.textContent = "You can order up to " + m + " " + cur + "-egg tray" + (m === 1 ? "" : "s") +
-            (eggsInCart() > 0 ? " more (some are already in your cart)." : ".");
+          note.textContent = "You can order up to " + m + " " + cur + "-egg tray" + (m === 1 ? "" : "s") + ".";
         } else {
           note.textContent = "";
         }
@@ -270,6 +271,13 @@ document.addEventListener("DOMContentLoaded", function () {
         refreshStock();                      // redraws, and re-enables the button if still in stock
         if (qty > maxTrays(tray)) {
           alert("Stock just changed: only " + maxTrays(tray) + " " + tray + "-egg tray(s) can be ordered now. Please adjust your quantity.");
+          return;
+        }
+        // Eggs already in the cart (any tray size of this product) count against the same stock.
+        if (qty > canStillAdd(tray)) {
+          var more = canStillAdd(tray);
+          alert("Your cart already holds some of this stock. " +
+            (more > 0 ? "You can add " + more + " more " + tray + "-egg tray(s)." : "You can't add any more of this size."));
           return;
         }
 

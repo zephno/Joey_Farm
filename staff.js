@@ -159,9 +159,10 @@ $(document).ready(function () {
                         message.status === 'archived' ? 'badge-secondary' : 'badge-success'))
                     .text(message.status.charAt(0).toUpperCase() + message.status.slice(1))
             ));
-            $row.append($('<td>').text(message.message.length > 80
+            var preview = message.message.length > 80
                 ? message.message.slice(0, 80) + '…'
-                : message.message));
+                : message.message;
+            $row.append($('<td>').text((message.has_image ? '📎 ' : '') + preview));
             $row.append($('<td class="text-center">').append(
                 $('<button type="button">').addClass('btn btn-outline-primary btn-sm rounded-pill px-3 btn-view-message')
                     .attr('data-message-id', message.id).text('View')
@@ -197,6 +198,22 @@ $(document).ready(function () {
         $('#message-date').text(message.created_at);
         $('#message-content').text(message.message);
         $('#message-status').text(message.status.charAt(0).toUpperCase() + message.status.slice(1));
+
+        // The photo the customer attached (only staff can open it, see contact_image.php)
+        var $photo = $('#message-photo');
+        if (!$photo.length) {
+            $photo = $('<div id="message-photo" class="mt-3"></div>').insertAfter('#message-content');
+        }
+        $photo.empty();
+        if (message.has_image) {
+            var src = 'contact_image.php?id=' + encodeURIComponent(message.id);
+            $photo.append($('<label class="font-weight-bold mb-1 d-block">').text('Attached photo:'))
+                .append($('<a target="_blank" rel="noopener">').attr('href', src).append(
+                    $('<img class="img-fluid rounded border" style="max-height: 320px;" alt="Photo attached by the customer">').attr('src', src)
+                ))
+                .append($('<small class="form-text text-muted">').text('Click the photo to open it full size.'));
+        }
+
         $('#message-action-error').prop('hidden', true).text('');
         $('.message-mark-read').prop('hidden', message.status !== 'unread');
         $('.message-archive').prop('hidden', message.status === 'archived');

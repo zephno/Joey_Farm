@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
+require __DIR__ . '/includes/stock.php';
 
 $me = current_user();
 if (!$me) json_out(['error' => 'Please log in first.'], 401);
@@ -25,6 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!preg_match('/^[a-z0-9_-]{2,30}$/', $key)) json_out(['error' => 'Invalid size.'], 422);
     if (!in_array($tray, [12, 24, 36], true)) json_out(['error' => 'Tray size must be 12, 24 or 36.'], 422);
 
+    // Fresh stock cannot drop below what confirmed orders have already reserved.
+    $reserved = stock_map($pdo)[$key]['reserved'] ?? 0;
+    if ($vals['fresh'] < $reserved) {
+        json_out(['error' => 'Fresh stock cannot be set below ' . number_format($reserved)
+            . ' eggs: that many are reserved for confirmed orders. Complete or cancel those orders first.'], 409);
+    }
+
     $exists = $pdo->prepare('SELECT 1 FROM inventory WHERE size_key = ?');
     $exists->execute([$key]);
     if ($exists->fetchColumn()) {
@@ -37,5 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     json_out(['ok' => true]);
 }
 
-$rows = $pdo->query('SELECT size_key, tray_size, fresh, near_expiry, unsellable FROM inventory')->fetchAll();
+$stock = stock_map($pdo);
+$rows  = $pdo->query('SELECT size_key, tray_size, fresh, near_expiry, unsellable FROM inventory')->fetchAll();
+foreach ($rows as &$r) {
+    $r['reserved'] = $stock[$r['size_key']]['reserved'] ?? 0;
+}
+unset($r);
 json_out(['rows' => $rows]);
