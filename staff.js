@@ -34,21 +34,134 @@ $(document).ready(function () {
        ORDERS FILTERING & DISPLAY
        ------------------------------------------------------------------ */
     $(document).on('click', '.order-filter', function () {
-        var filter = $(this).data('filter');
         $('.order-filter').removeClass('active');
         $(this).addClass('active');
-
-        if (filter === 'all') {
-            $('.order-card-wrapper').show();
-        } else {
-            $('.order-card-wrapper').hide();
-            $('.order-card-wrapper[data-status="' + filter + '"]').show();
-        }
+        applyOrderFilters();
     });
+
+    $(document).on('click', '.order-date-filter', function () {
+        $('.order-date-filter').removeClass('active');
+        $(this).addClass('active');
+        applyOrderFilters();
+    });
+
+    function matchesOrderDate(dateValue, filter) {
+        if (filter === 'all') return true;
+        if (!dateValue) return false;
+
+        var orderDate = new Date(String(dateValue).replace(' ', 'T'));
+        if (Number.isNaN(orderDate.getTime())) return false;
+
+        var now = new Date();
+        if (filter === 'today') {
+            return orderDate.getFullYear() === now.getFullYear()
+                && orderDate.getMonth() === now.getMonth()
+                && orderDate.getDate() === now.getDate();
+        }
+        if (filter === 'month') {
+            return orderDate.getFullYear() === now.getFullYear()
+                && orderDate.getMonth() === now.getMonth();
+        }
+        if (filter === 'week') {
+            var startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            startOfWeek.setDate(startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7));
+            return orderDate >= startOfWeek && orderDate <= now;
+        }
+        return true;
+    }
+
+    var orderManagementPageSize = 10;
+    var orderManagementTables = {
+        pending: { table: '#pending-orders-table tbody', pagination: '#pending-orders-pagination', rows: [], page: 1 },
+        confirmed: { table: '#confirmed-orders-table tbody', pagination: '#confirmed-orders-pagination', rows: [], page: 1 },
+        completed: { table: '#completed-orders-table tbody', pagination: '#completed-orders-pagination', rows: [], page: 1 },
+        cancelled: { table: '#cancelled-orders-table tbody', pagination: '#cancelled-orders-pagination', rows: [], page: 1 },
+        returns: { table: '#return-requests-table tbody', pagination: '#returns-orders-pagination', rows: [], page: 1 }
+    };
+
+    function renderOrderManagementTable(status, dateFilter) {
+        var table = orderManagementTables[status];
+        var filteredRows = table.rows.filter(function(row) {
+            return matchesOrderDate(row.attr('data-created-at'), dateFilter);
+        });
+        var pageCount = Math.max(1, Math.ceil(filteredRows.length / orderManagementPageSize));
+        table.page = Math.min(table.page, pageCount);
+        var start = (table.page - 1) * orderManagementPageSize;
+        var $tbody = $(table.table).empty();
+
+        filteredRows.slice(start, start + orderManagementPageSize).forEach(function(row) {
+            $tbody.append(row);
+        });
+
+        var $pagination = $(table.pagination);
+        $pagination.prop('hidden', filteredRows.length <= orderManagementPageSize);
+        $pagination.find('.order-management-page-status').text(
+            filteredRows.length
+                ? 'Showing ' + (start + 1) + '-' + Math.min(start + orderManagementPageSize, filteredRows.length) +
+                    ' of ' + filteredRows.length + ' orders · Page ' + table.page + ' of ' + pageCount
+                : ''
+        );
+        $pagination.find('.order-management-page-prev').prop('disabled', table.page <= 1);
+        $pagination.find('.order-management-page-next').prop('disabled', table.page >= pageCount);
+        return filteredRows.length;
+    }
+
+    $(document).on('click', '.order-management-page-prev, .order-management-page-next', function() {
+        var paginationId = $(this).closest('.order-management-pagination').attr('id');
+        var status = paginationId.replace('-orders-pagination', '');
+        var table = orderManagementTables[status];
+        if (!table) return;
+
+        if ($(this).hasClass('order-management-page-prev') && table.page > 1) {
+            table.page -= 1;
+        } else if ($(this).hasClass('order-management-page-next')) {
+            var pageCount = Math.max(1, Math.ceil(table.rows.length / orderManagementPageSize));
+            if (table.page < pageCount) table.page += 1;
+        }
+        applyOrderFilters();
+    });
+
+    function applyOrderFilters() {
+        var statusFilter = $('.order-filter.active').data('filter') || 'all';
+        var dateFilter = $('.order-date-filter.active').data('date-filter') || 'all';
+
+        var matchingCounts = {};
+        Object.keys(orderManagementTables).forEach(function(status) {
+            matchingCounts[status] = renderOrderManagementTable(status, status === 'returns' ? 'all' : dateFilter);
+        });
+
+        $('.order-card-wrapper').each(function () {
+            var $wrapper = $(this);
+            var status = $wrapper.data('status');
+            if (status === 'returns') {
+                $wrapper.toggle(statusFilter === 'all' || statusFilter === 'returns');
+                return;
+            }
+
+            var statusMatches = statusFilter === 'all' || status === statusFilter;
+            $wrapper.toggle(statusMatches && (matchingCounts[status] || 0) > 0);
+        });
+    }
 
     function baseCells($row, order) {
         $row.attr('data-id', order.id);
-        $row.append($('<td>').addClass('details').text(order.details));
+        $row.attr('data-created-at', order.created_at || '');
+        var $details = $('<td>').addClass('details');
+        if (Array.isArray(order.detail_items) && order.detail_items.length) {
+            var $itemList = $('<div>').addClass('order-details-list');
+            order.detail_items.forEach(function (item) {
+                var $item = $('<div>').addClass('order-detail-item');
+                $item.append($('<strong>').addClass('order-detail-product').text(item.title));
+                $item.append($('<span>').addClass('order-detail-quantity')
+                    .text(item.qty + (Number(item.qty) === 1 ? ' tray' : ' trays') + ' × ' + item.tray_size + ' eggs'));
+                $item.append($('<span>').addClass('order-detail-total').text(Number(item.eggs_total).toLocaleString('en-US') + ' eggs total'));
+                $itemList.append($item);
+            });
+            $details.append($itemList);
+        } else {
+            $details.text(order.details);
+        }
+        $row.append($details);
         $row.append($('<td>').addClass('receipt font-weight-bold text-secondary').text(order.receipt));
         $row.append($('<td>').addClass('amount font-weight-bold').text(peso(order.total)));
         $row.append($('<td>').addClass('date').text(order.delivery_date));
@@ -66,73 +179,159 @@ $(document).ready(function () {
     }
 
     function cancelBtn() {
-        return $('<button type="button">').addClass('btn btn-outline-danger btn-sm btn-cancel-order ml-1 rounded-pill')
+        return $('<button type="button">').addClass('btn btn-outline-danger btn-sm btn-cancel-order order-action-btn')
             .text('Cancel');
+    }
+
+    function orderActionButton(actionClass, styleClass, label) {
+        return $('<button type="button">').addClass('btn btn-sm ' + styleClass + ' ' + actionClass + ' order-action-btn')
+            .text(label);
     }
 
     function remarkInput(val) {
         return $('<input type="text" class="table-input remark-field" placeholder="Add a remark">').val(val || '');
     }
 
-    function renderOrders(orders) {
-        var $recent    = $('#recent-orders-table tbody').empty();
-        var $pending   = $('#pending-orders-table tbody').empty();
-        var $confirmed = $('#confirmed-orders-table tbody').empty();
-        var $completed = $('#completed-orders-table tbody').empty();
-        var $cancelled = $('#cancelled-orders-table tbody').empty();
+    var recentOrdersPage = 1;
+    var recentOrdersPerPage = 10;
+    var recentOrderRows = [];
 
-        orders.forEach(function (order, index) {
-            // Home tab: most recent 5 orders with status, remarks, and actions
-            if (index < 5) {
-                var $r = $('<tr>');
-                baseCells($r, order);
-                $r.append($('<td>').append(statusBadge(order.status)));
-                $r.append($('<td>').append(remarkInput(order.remark)));
-                var $act = $('<td class="text-center">');
-                if (order.status === 'pending') {
-                    $act.append($('<button>').addClass('btn btn-sm btn-primary rounded-pill btn-confirm-order px-3').text('Confirm'))
-                        .append(cancelBtn());
-                } else if (order.status === 'confirmed') {
-                    $act.append($('<button>').addClass('btn btn-sm btn-success rounded-pill btn-complete-order px-3').text('Complete'))
-                        .append(cancelBtn());
-                }
-                $r.append($act);
-                $recent.append($r);
+    function renderRecentOrdersPage() {
+        var $recent = $('#recent-orders-table tbody').empty();
+        var pageCount = Math.max(1, Math.ceil(recentOrderRows.length / recentOrdersPerPage));
+        recentOrdersPage = Math.min(recentOrdersPage, pageCount);
+        var start = (recentOrdersPage - 1) * recentOrdersPerPage;
+
+        recentOrderRows.slice(start, start + recentOrdersPerPage).forEach(function($row) {
+            $recent.append($row);
+        });
+
+        var $pagination = $('#recent-orders-pagination');
+        $pagination.prop('hidden', recentOrderRows.length <= recentOrdersPerPage);
+        $('#recent-orders-page-status').text(
+            recentOrderRows.length
+                ? 'Showing ' + (start + 1) + '-' + Math.min(start + recentOrdersPerPage, recentOrderRows.length) +
+                    ' of ' + recentOrderRows.length + ' orders · Page ' + recentOrdersPage + ' of ' + pageCount
+                : 'No orders'
+        );
+        $('#recent-orders-prev').prop('disabled', recentOrdersPage <= 1);
+        $('#recent-orders-next').prop('disabled', recentOrdersPage >= pageCount);
+    }
+
+    $('#recent-orders-prev').on('click', function() {
+        if (recentOrdersPage > 1) {
+            recentOrdersPage -= 1;
+            renderRecentOrdersPage();
+        }
+    });
+
+    $('#recent-orders-next').on('click', function() {
+        var pageCount = Math.max(1, Math.ceil(recentOrderRows.length / recentOrdersPerPage));
+        if (recentOrdersPage < pageCount) {
+            recentOrdersPage += 1;
+            renderRecentOrdersPage();
+        }
+    });
+
+    function renderOrders(orders) {
+        recentOrderRows = [];
+        Object.keys(orderManagementTables).forEach(function(status) {
+            orderManagementTables[status].rows = [];
+            orderManagementTables[status].page = 1;
+        });
+
+        orders.forEach(function (order) {
+            var $recentRow = $('<tr>');
+            baseCells($recentRow, order);
+            $recentRow.append($('<td>').append(statusBadge(order.status)));
+            $recentRow.append($('<td>').append(remarkInput(order.remark)));
+            var $recentAction = $('<td class="text-center">');
+            if (order.status === 'pending') {
+                $recentAction.append($('<div class="order-action-buttons">')
+                    .append(orderActionButton('btn-confirm-order', 'btn-primary', 'Confirm'))
+                    .append(cancelBtn()));
+            } else if (order.status === 'confirmed') {
+                $recentAction.append($('<div class="order-action-buttons">')
+                    .append(orderActionButton('btn-complete-order', 'btn-success', 'Complete'))
+                    .append(cancelBtn()));
             }
+            $recentRow.append($recentAction);
+            recentOrderRows.push($recentRow);
 
             // Orders tab: separate cards/tables per status with dedicated Remarks column
             var $row = $('<tr>');
             baseCells($row, order);
 
             if (order.status === 'pending') {
-                $row.append($('<td>').append($('<button>').addClass('btn btn-sm btn-primary rounded-pill btn-confirm-order px-3').text('Confirm'))
-                    .append(cancelBtn()));
+                $row.append($('<td>').append($('<div class="order-action-buttons">')
+                    .append(orderActionButton('btn-confirm-order', 'btn-primary', 'Confirm'))
+                    .append(cancelBtn())));
                 $row.append($('<td>').append(remarkInput(order.remark)));
-                $pending.append($row);
+                orderManagementTables.pending.rows.push($row);
             } else if (order.status === 'confirmed') {
-                $row.append($('<td>').append($('<button>').addClass('btn btn-sm btn-success rounded-pill btn-complete-order px-3').text('Complete'))
-                    .append(cancelBtn()));
+                $row.append($('<td>').append($('<div class="order-action-buttons">')
+                    .append(orderActionButton('btn-complete-order', 'btn-success', 'Complete'))
+                    .append(cancelBtn())));
                 $row.append($('<td>').append(remarkInput(order.remark)));
-                $confirmed.append($row);
+                orderManagementTables.confirmed.rows.push($row);
             } else if (order.status === 'completed') {
                 $row.append($('<td>').append(statusBadge('completed')));
                 $row.append($('<td>').append(remarkInput(order.remark)));
-                $completed.append($row);
+                orderManagementTables.completed.rows.push($row);
             } else {
                 $row.append($('<td>').append(statusBadge('cancelled')));
                 $row.append($('<td>').append(remarkInput(order.remark)));
-                $cancelled.append($row);
+                orderManagementTables.cancelled.rows.push($row);
             }
         });
+        renderRecentOrdersPage();
+        applyOrderFilters();
     }
 
     function refreshOrders() {
         return api('orders.php?scope=all').then(function (res) {
             renderOrders(res.orders);
+            renderReturnRequests(res.pending_returns || []);
             $('#val-daily').text(peso(res.sales.daily));
             $('#val-weekly').text(peso(res.sales.weekly));
             $('#val-monthly').text(peso(res.sales.monthly));
         }).catch(showError);
+    }
+
+    function renderReturnRequests(returns) {
+        var table = orderManagementTables.returns;
+        table.rows = [];
+        table.page = 1;
+        if (!returns.length) {
+            table.rows.push($('<tr>').append(
+                $('<td colspan="7">').addClass('text-center text-muted').text('No pending customer return requests.')
+            ));
+            renderOrderManagementTable('returns', 'all');
+            return;
+        }
+
+        returns.forEach(function (request) {
+            var $row = $('<tr>');
+            $row.append($('<td>').text(request.customer_name || 'Customer account unavailable'));
+            $row.append($('<td>').text(request.receipt_no || 'Order #' + request.order_id));
+            $row.append($('<td>').text(request.size_key));
+            $row.append($('<td>').text(request.broken_qty));
+            $row.append($('<td>').text(peso(request.discount_amount)));
+            $row.append($('<td>').text(request.created_at));
+
+            var $actions = $('<td class="text-nowrap">');
+            $actions.append($('<button type="button">')
+                .addClass('btn btn-sm btn-success btn-approve-return mr-1')
+                .attr('data-return-id', request.id)
+                .text('Approve'));
+            $actions.append($('<button type="button">')
+                .addClass('btn btn-sm btn-outline-danger btn-reject-return')
+                .attr('data-return-id', request.id)
+                .text('Reject'));
+            $row.append($actions);
+            table.rows.push($row);
+        });
+        renderOrderManagementTable('returns', 'all');
     }
 
     /* ------------------------------------------------------------------
@@ -214,27 +413,6 @@ $(document).ready(function () {
                 .append($('<small class="form-text text-muted">').text('Click the photo to open it full size.'));
         }
 
-        // Staff verify the cracked-egg report -> customer gets a flat 10% off their next order.
-        var $disc = $('#message-discount');
-        if (!$disc.length) {
-            $disc = $('<div id="message-discount" class="mt-3"></div>').insertAfter('#message-photo');
-        }
-        $disc.empty();
-        $disc.append($('<div class="small mb-2">').append($('<strong>').text('Order: '))
-            .append(document.createTextNode(message.order_receipt || 'not linked to an order')));
-        if (message.discount_granted) {
-            $disc.append($('<span class="badge badge-success p-2">').text('✔ Report verified: 10% discount given for the next order'));
-        } else if (!message.order_id) {
-            $disc.append($('<small class="form-text text-muted">').text('No order is linked to this message, so no discount can be given.'));
-        } else if (message.order_discounted) {
-            $disc.append($('<span class="badge badge-secondary p-2">').text('A report for this order was already verified. No second discount.'));
-        } else {
-            $disc.append($('<button type="button" class="btn btn-success btn-sm message-grant-discount">')
-                    .text('Verify report & give 10% discount'))
-                .append($('<small class="form-text text-muted">').text(
-                    'Only click this after checking that the photo really shows cracked eggs. One discount per order.'));
-        }
-
         $('#message-action-error').prop('hidden', true).text('');
         $('.message-mark-read').prop('hidden', message.status !== 'unread');
         $('.message-archive').prop('hidden', message.status === 'archived');
@@ -260,11 +438,6 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-view-message', function () {
         showContactMessage($(this).data('message-id'));
-    });
-
-    $(document).on('click', '.message-grant-discount', function () {
-        if (!confirm('Verify this report and give the customer 10% off their next order?')) return;
-        updateContactMessage('grant_discount');
     });
 
     $('.message-mark-read').on('click', function () {
@@ -299,6 +472,22 @@ $(document).ready(function () {
         var id = $(this).closest('tr').data('id');
         api('orders.php', { action: 'complete', id: id }).then(function () {
             return Promise.all([refreshOrders(), loadInventory()]);
+        }).catch(showError);
+    });
+
+    $(document).on('click', '.btn-approve-return, .btn-reject-return', function () {
+        var $button = $(this);
+        var approve = $button.hasClass('btn-approve-return');
+        var returnId = parseInt($button.attr('data-return-id'), 10);
+        if (approve && !window.confirm('Approve this return and add its credit to the customer\'s next order?')) return;
+        if (!approve && !window.confirm('Reject this customer return request?')) return;
+
+        api('orders.php', {
+            action: approve ? 'approve_return' : 'reject_return',
+            return_id: returnId
+        }).then(function (res) {
+            alert(res.message);
+            return Promise.all([refreshOrders(), approve ? loadInventory() : Promise.resolve()]);
         }).catch(showError);
     });
 

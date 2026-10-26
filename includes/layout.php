@@ -13,11 +13,13 @@ function staff_header(string $title, string $active): void
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joey's Farm | <?= e($title) ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="staff.css">
+    <link rel="stylesheet" href="staff.css?v=2">
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="brand.css?v=9">
 </head>
 <body class="has-fixed-nav">
 <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+    <a class="navbar-brand farm-brand" href="staff.html"><img src="images/logo.png" alt=""><span>Joey's Farm</span></a>
     <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
         <span class="navbar-toggler-icon"></span>
     </button>

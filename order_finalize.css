@@ -39,16 +39,16 @@ body {
 }
 
 .btn-confirm {
-    border-color: #044ce6;
+    border-color: #e69500;
     border-radius: 1.5rem;
-    background-color: #044ce6;
+    background-color: #e69500;
     color: #fff;
 }
 
 .btn-confirm:hover,
 .btn-confirm:focus {
-    border-color: #0034a3;
-    background-color: #0034a3;
+    border-color: #cc8400;
+    background-color: #cc8400;
     color: #fff;
     transition: all 0.5s;
 }

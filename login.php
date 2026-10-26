@@ -50,6 +50,7 @@ if (current_user() && $_SERVER['REQUEST_METHOD'] === 'GET') {
     <title>Joey's Farm | Login</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="brand.css?v=6">
 </head>
 <body>
 <div class="container" style="max-width:420px;padding-top:80px">
@@ -66,7 +67,7 @@ if (current_user() && $_SERVER['REQUEST_METHOD'] === 'GET') {
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-block mt-3" style="background:#e69500;border-color:#e69500">Login</button>
+            <button type="submit" class="btn btn-primary btn-block mt-3">Login</button>
         </form>
         <p class="small mt-3 mb-0">No account? <a href="register.php">Sign up</a> &middot; <a href="Index.html">Back to home</a></p>
     </div>

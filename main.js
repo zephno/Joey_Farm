@@ -52,65 +52,16 @@ $(document).ready(function(){
     // add it just above the Send button (Homepage.html can also contain it directly).
     if (!$('#contactImage').length) {
       $('<div class="form-group">' +
-          '<label for="contactImage">Photo proof (required) <span class="badge badge-warning"><i class="fas fa-camera"></i> Required</span></label>' +
+          '<label for="contactImage">Photo (required)</label>' +
           '<input type="file" class="form-control-file contact-field" id="contactImage" ' +
                  'accept="image/jpeg,image/png,image/webp" readonly required>' +
-          '<small class="form-text text-muted">A clear photo of the cracked eggs is required as proof. JPG, PNG or WebP; large photos are shrunk automatically.</small>' +
+          '<small class="form-text text-muted">JPG, PNG or WebP. Large photos are shrunk automatically.</small>' +
         '</div>').insertBefore('#contactSendButton');
     }
 
-    // Which delivered order is this about? (required for cracked-egg reports, optional otherwise)
-    var isReportMode = new URLSearchParams(window.location.search).has('report');
-    var $orderGroup = $('<div class="form-group" id="contactOrderGroup">' +
-        '<label for="contactOrder">Order you are reporting' +
-          (isReportMode ? ' <span class="badge badge-warning">Required</span>' : '') + '</label>' +
-        '<select class="form-control" id="contactOrder" disabled>' +
-          '<option value="">' + (isReportMode ? 'Choose a delivered order…' : 'Not about a specific order') + '</option>' +
-        '</select>' +
-        '<small class="form-text text-muted" id="contactOrderHelp">Only your delivered orders are listed.</small>' +
-      '</div>');
-    var $imgGroup = $('#contactImage').closest('.form-group');
-    if ($imgGroup.length) $orderGroup.insertBefore($imgGroup); else $orderGroup.insertBefore('#contactSendButton');
-
-    function loadReportableOrders() {
-      return fetch('orders.php?scope=reportable', {
-        credentials: 'same-origin', cache: 'no-store', headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).then(function(r) { return r.ok ? r.json() : { orders: [] }; }).then(function(res) {
-        var $sel = $('#contactOrder');
-        var keep = $sel.val();
-        $sel.find('option:not(:first)').remove();
-        (res.orders || []).forEach(function(o) {
-          $sel.append($('<option>').val(o.id).text(o.receipt + ' (delivered ' + o.date + ')'));
-        });
-        $sel.val(keep).prop('disabled', false);
-        if (!(res.orders || []).length) {
-          $('#contactOrderHelp').text(isReportMode
-            ? 'You have no delivered orders that can be reported (orders that already have a verified report are not listed).'
-            : 'You have no delivered orders to report.');
-        }
-      }).catch(function() {});
-    }
-
-    var MAX_UPLOAD_BYTES = 2 * 1024 * 1024;     // the server accepts up to 2 MB
+    var MAX_UPLOAD_BYTES = 1.5 * 1024 * 1024;
     var $contactFields = $contactForm.find('.contact-field');
     var $contactStatus = $('#contactStatus');
-    // Coming from "Report Cracked Egg" on the orders page (Homepage.html?report=1).
-    function applyReportMode() {
-      if (!new URLSearchParams(window.location.search).has('report')) return;
-      var $msg = $('#contactMessage');
-      if (!$msg.val()) {
-        $msg.val('Cracked egg report\nNumber of cracked eggs: \nDetails: ');
-      }
-      if (!$('#reportNote').length) {
-        $('<div id="reportNote" class="alert alert-warning">' +
-            '<strong>Reporting cracked eggs:</strong> fill in your receipt number and attach a clear ' +
-            '<strong>photo of the cracked eggs</strong> as proof. Reports without a photo cannot be sent.' +
-          '</div>').insertBefore($contactForm);
-      }
-      var form = document.getElementById('formDesign') || $contactForm[0];
-      if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
     var contactSession = fetch('session.php', {
       credentials: 'same-origin',
       cache: 'no-store'
@@ -123,8 +74,6 @@ $(document).ready(function(){
         $('#contactEmail').val(session.email);
         $contactFields.prop('readonly', false);
         $('#contactSendButton').prop('disabled', false);
-        loadReportableOrders();
-        applyReportMode();
         return true;
       }
       return false;
@@ -200,11 +149,6 @@ $(document).ready(function(){
           return;
         }
 
-        if (isReportMode && !$('#contactOrder').val()) {
-          $status.addClass('alert alert-danger').text('Please choose the delivered order you are reporting.');
-          return;
-        }
-
         var $button = $('#contactSendButton').prop('disabled', true);
         $status.text('Sending…');
 
@@ -214,7 +158,6 @@ $(document).ready(function(){
           form.append('name', $('#contactName').val());
           form.append('email', $('#contactEmail').val());
           form.append('message', $('#contactMessage').val());
-          form.append('order_id', $('#contactOrder').val() || '');
           form.append('image', blob, blob === photo ? photo.name : 'photo.jpg');
 
           // No Content-Type header here: the browser adds the multipart boundary itself.
@@ -232,7 +175,6 @@ $(document).ready(function(){
         }).then(function() {
           $('#contactMessage').val('');
           $('#contactImage').val('');
-          $('#contactOrder').val('');
           $status.addClass('alert alert-success').text('Your message has been sent.');
         }).catch(function(error) {
           $status.addClass('alert alert-danger')

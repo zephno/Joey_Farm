@@ -4,14 +4,17 @@
     <title>Joey's Farm - Cart</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="auth-guard.js" data-role="customer"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="main.css">
-    <link rel="stylesheet" type="text/css" href="cart.css?v=2">
+    <link rel="stylesheet" type="text/css" href="cart.css?v=4">
     <link rel="stylesheet" type="text/css" href="navbar.css">
+    <link rel="stylesheet" href="brand.css?v=11">
 </head>
 <body class="has-fixed-nav">
 
     <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+      <a class="navbar-brand farm-brand" href="Homepage.html"><img src="images/logo.png" alt=""><span>Joey's Farm</span></a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -29,36 +32,50 @@
             <li class="nav-item">
               <a class="btn nav-login-btn" href="logout.php">Logout</a>
             </li>
-            <li class="nav-item">
-              <a class="cart-icon-circle text-dark" href="cart.html" title="Cart">🛒</a>
-            </li>
         </ul>
       </div>
     </nav>
 
-    <div class="container mt-4">
+    <main class="container cart-page mt-4">
         <div class="mb-4">
             <a href="Order.html" class="back-btn">&larr; Continue Shopping</a>
         </div>
         
         <h3 class="mb-4 text-dark font-weight-bold">Your Cart</h3>
 
-        <div class="col-lg-10 mx-auto" id="cartItems">
+      <div class="row cart-layout">
+        <section class="col-lg-8" aria-label="Cart items">
+          <div id="cartItems">
             <!-- Cart items are rendered here by cart.js -->
-        </div>
-    </div>
+          </div>
+        </section>
 
-    <div class="bottom-bar">
-        <div class="cart-total-wrap">
-            <span class="cart-total-label">Total:</span>
-            <span class="cart-total" id="cartTotal">₱ 0.00</span>
+        <aside class="col-lg-4">
+          <div class="cart-summary-card">
+            <h2 class="cart-summary-title">Price breakdown</h2>
+                    <small class="cart-selection-note" id="cartSelectionNote" hidden>Select at least one item to proceed to checkout.</small>
+            <div class="cart-price-summary">
+              <span class="cart-total-label">Subtotal</span>
+              <span class="cart-price-value" id="cartSubtotal">₱ 0.00</span>
+              <span class="cart-total-label" id="cartCreditAvailableLabel" hidden>Return credit available</span>
+              <span class="cart-price-value" id="cartCreditAvailable" hidden>₱ 0.00</span>
+              <span class="cart-total-label cart-discount-label" id="cartDiscountLabel" hidden>Credit applied to matching products</span>
+              <span class="cart-price-value cart-discount-value" id="cartDiscount" hidden>- ₱ 0.00</span>
+              <span class="cart-total-label cart-final-label">Estimated total</span>
+              <span class="cart-total" id="cartTotal">₱ 0.00</span>
+            </div>
+            <small class="cart-credit-note" id="cartCreditNote" hidden>Return credit applies only to the same product returned.</small>
+            <a href="order_finalize.html" class="btn btn-finalize btn-block" id="checkoutBtn">Proceed to Checkout</a>
+          </div>
+        </aside>
         </div>
-        <a href="order_finalize.html" class="btn btn-finalize" id="checkoutBtn">Proceed to Checkout</a>
-    </div>
+    </main>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="main.js"></script>
-    <script src="cart.js"></script>
+    <script src="cart-session.js?v=1"></script>
+    <script src="cart.js?v=8"></script>
+    <script src="floating-cart.js?v=3"></script>
 </body>
 </html>

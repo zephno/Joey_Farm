@@ -47,11 +47,25 @@
       c.badge.textContent = 'In Stock';
       c.badge.style.display = 'inline-block';
 
-      // One number per tray size, e.g. "Up to 8 × 12-egg, 4 × 24-egg or 2 × 36-egg trays"
-      c.stockLine.appendChild(
-        el('small', 'text-muted',
-          'Up to ' + t12 + ' × 12-egg, ' + t24 + ' × 24-egg or ' + t36 + ' × 36-egg trays')
-      );
+        var options = [['12', t12], ['24', t24], ['36', t36]];
+        var label = el('div', 'stock-availability-label', 'Available trays');
+        var trayGrid = el('div', 'stock-tray-grid');
+        var summary = [];
+
+        options.forEach(function (option) {
+          var traySize = option[0];
+          var count = option[1];
+          var tray = el('div', 'stock-tray-option' + (count === 0 ? ' is-empty' : ''));
+          tray.appendChild(el('span', 'stock-tray-count', String(count)));
+          tray.appendChild(el('span', 'stock-tray-label', traySize + '-egg tray'));
+          trayGrid.appendChild(tray);
+          summary.push(count + (count === 1 ? ' tray of ' : ' trays of ') + traySize + ' eggs');
+        });
+
+        c.stockLine.setAttribute('role', 'group');
+        c.stockLine.setAttribute('aria-label', 'Available trays: ' + summary.join(', '));
+        c.stockLine.appendChild(label);
+        c.stockLine.appendChild(trayGrid);
 
       c.btn.textContent = 'Select Size';
       c.btn.className = 'btn btn-order btn-block mt-auto';

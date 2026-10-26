@@ -20,7 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!filter_var($old['email'], FILTER_VALIDATE_EMAIL)) $errors[] = 'Enter a valid email address.';
     if (strlen($pass) < 6) $errors[] = 'Password must be at least 6 characters.';
     if ($pass !== $pass2) $errors[] = 'Passwords do not match.';
-    if ($old['contact'] !== '' && !preg_match('/^[0-9]{8}$/', $old['contact'])) $errors[] = 'Contact number must be exactly 8 digits.';
+    if ($old['contact'] !== '' && !preg_match('/^09[0-9]{9}$/', $old['contact'])) {
+        $errors[] = 'Contact number must be exactly 11 digits starting with 09 (e.g. 09123456789).';
+    }
 
     if (!$errors) {
         $chk = db()->prepare('SELECT 1 FROM users WHERE email = ?');
@@ -31,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        // Public sign-up always creates a customer; only staff can create staff accounts.
         $ins = db()->prepare('INSERT INTO users (name, email, password_hash, role, address, contact) VALUES (?, ?, ?, "customer", ?, ?)');
         $ins->execute([$old['name'], $old['email'], password_hash($pass, PASSWORD_DEFAULT), $old['address'], $old['contact']]);
 
@@ -49,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Joey's Farm | Sign up</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="brand.css?v=6">
 </head>
 <body>
 <div class="container" style="max-width:480px;padding:60px 15px">
@@ -60,16 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group"><label for="name">Full name</label>
                 <input class="form-control" id="name" name="name" value="<?= e($old['name']) ?>" required></div>
             <div class="form-group"><label for="email">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?= e($old['email']) ?>" required></div>
+                <input type="email" class="form-control" id="email" name="email" placeholder="e.g. name@example.com" value="<?= e($old['email']) ?>" required></div>
             <div class="form-group"><label for="address">Address</label>
                 <input class="form-control" id="address" name="address" value="<?= e($old['address']) ?>"></div>
-            <div class="form-group"><label for="contact">Contact No. (8 digits)</label>
-                <input class="form-control" id="contact" name="contact" maxlength="8" pattern="[0-9]{8}" value="<?= e($old['contact']) ?>"></div>
+            <div class="form-group"><label for="contact">Contact No. (11 digits, 09XXXXXXXXX)</label>
+                <input type="tel" class="form-control" id="contact" name="contact" maxlength="11" pattern="09[0-9]{9}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="09123456789" value="<?= e($old['contact']) ?>" title="Must be 11 digits starting with 09"></div>
             <div class="form-group"><label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password" minlength="6" required></div>
             <div class="form-group"><label for="password2">Confirm password</label>
                 <input type="password" class="form-control" id="password2" name="password2" minlength="6" required></div>
-            <button type="submit" class="btn btn-primary btn-block" style="background:#e69500;border-color:#e69500">Sign up</button>
+            <button type="submit" class="btn btn-primary btn-block">Sign up</button>
         </form>
         <p class="small mt-3 mb-0">Already registered? <a href="login.php">Login</a> &middot; <a href="Index.html">Back to home</a></p>
     </div>

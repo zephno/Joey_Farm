@@ -6,13 +6,15 @@
     <title>Joey's Farm</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="staff.css?v=3">
+    <link rel="stylesheet" href="staff.css?v=8">
     <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="brand.css?v=9">
 </head>
 <body class="has-fixed-nav">
 
     <!-- NAVIGATION BAR -->
     <nav class="navbar navbar-expand-md fixed-top navbar-solid">
+        <a class="navbar-brand farm-brand" href="staff.html"><img src="images/logo.png" alt=""><span>Joey's Farm</span></a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -98,7 +100,7 @@
                             <table class="table custom-table mb-0" id="recent-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>Order Details</th>
+                                        <th>Items Ordered</th>
                                         <th>Receipt No.</th>
                                         <th>Amount</th>
                                         <th>Delivery Date</th>
@@ -110,6 +112,13 @@
                                 <tbody>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="recent-orders-pagination" id="recent-orders-pagination" aria-label="Recent order activity pages" hidden>
+                            <span class="recent-orders-page-status" id="recent-orders-page-status" aria-live="polite"></span>
+                            <div class="recent-orders-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="recent-orders-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="recent-orders-next" disabled>Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -251,6 +260,13 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="order-management-pagination" id="pending-orders-pagination" aria-label="Pending order pages" hidden>
+                            <span class="order-management-page-status" aria-live="polite"></span>
+                            <div class="order-management-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-next" disabled>Next</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -316,6 +332,13 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="order-management-pagination" id="confirmed-orders-pagination" aria-label="Confirmed order pages" hidden>
+                            <span class="order-management-page-status" aria-live="polite"></span>
+                            <div class="order-management-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-next" disabled>Next</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -351,6 +374,19 @@
                     <button type="button" class="btn btn-outline-danger order-filter" data-filter="cancelled">
                         <i class="fas fa-times-circle mr-1"></i> Cancelled
                     </button>
+                    <button type="button" class="btn btn-outline-warning order-filter" data-filter="returns">
+                        <i class="fas fa-egg mr-1"></i> Return Requests
+                    </button>
+                </div>
+
+                <div class="staff-order-date-controls mb-4" role="group" aria-label="Filter orders by date">
+                    <span class="staff-order-date-label">Order date</span>
+                    <div class="btn-group" role="group" aria-label="Order date range">
+                        <button type="button" class="btn btn-outline-secondary order-date-filter active" data-date-filter="all">All time</button>
+                        <button type="button" class="btn btn-outline-secondary order-date-filter" data-date-filter="month">This month</button>
+                        <button type="button" class="btn btn-outline-secondary order-date-filter" data-date-filter="week">This week</button>
+                        <button type="button" class="btn btn-outline-secondary order-date-filter" data-date-filter="today">Today</button>
+                    </div>
                 </div>
                 
                 <!-- Pending Orders Table -->
@@ -365,7 +401,7 @@
                             <table class="table custom-table mb-0" id="pending-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>Order Details</th>
+                                        <th>Items Ordered</th>
                                         <th>Receipt No.</th>
                                         <th>Amount</th>
                                         <th>Delivery Date</th>
@@ -375,7 +411,7 @@
                                 </thead>
                                 <tbody>
                                     <tr data-id="101">
-                                        <td class="details">5 Trays (36 Eggs/Tray) • 180 Eggs Total - Large</td>
+                                        <td class="details"><div class="order-details-list"><div class="order-detail-item"><strong class="order-detail-product">Large</strong><span class="order-detail-quantity">5 trays × 36 eggs</span><span class="order-detail-total">180 eggs total</span></div></div></td>
                                         <td class="receipt">REC-2026-001</td>
                                         <td class="amount font-weight-bold">₱ 1,550.00</td>
                                         <td class="date">2026-09-28</td>
@@ -388,6 +424,13 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="order-management-pagination" id="completed-orders-pagination" aria-label="Completed order pages" hidden>
+                            <span class="order-management-page-status" aria-live="polite"></span>
+                            <div class="order-management-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-next" disabled>Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -404,7 +447,7 @@
                             <table class="table custom-table mb-0" id="confirmed-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>Order Details</th>
+                                        <th>Items Ordered</th>
                                         <th>Receipt No.</th>
                                         <th>Amount</th>
                                         <th>Delivery Date</th>
@@ -414,7 +457,7 @@
                                 </thead>
                                 <tbody>
                                     <tr data-id="201">
-                                        <td class="details">3 Trays (12 Eggs/Tray) • 36 Eggs Total - XL</td>
+                                        <td class="details"><div class="order-details-list"><div class="order-detail-item"><strong class="order-detail-product">XL</strong><span class="order-detail-quantity">3 trays × 12 eggs</span><span class="order-detail-total">36 eggs total</span></div></div></td>
                                         <td class="receipt">REC-2026-000</td>
                                         <td class="amount font-weight-bold">₱ 327.00</td>
                                         <td class="date">2026-09-27</td>
@@ -427,6 +470,13 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="order-management-pagination" id="cancelled-orders-pagination" aria-label="Cancelled order pages" hidden>
+                            <span class="order-management-page-status" aria-live="polite"></span>
+                            <div class="order-management-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-next" disabled>Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -443,7 +493,7 @@
                             <table class="table custom-table mb-0" id="completed-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>Order Details</th>
+                                        <th>Items Ordered</th>
                                         <th>Receipt No.</th>
                                         <th>Amount</th>
                                         <th>Delivery Date</th>
@@ -453,7 +503,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="details">20 Trays (36 Eggs/Tray) • 720 Eggs Total - Large</td>
+                                        <td class="details"><div class="order-details-list"><div class="order-detail-item"><strong class="order-detail-product">Large</strong><span class="order-detail-quantity">20 trays × 36 eggs</span><span class="order-detail-total">720 eggs total</span></div></div></td>
                                         <td class="receipt">REC-2026-B99</td>
                                         <td class="amount font-weight-bold">₱ 6,200.00</td>
                                         <td class="date">2026-09-25</td>
@@ -478,7 +528,7 @@
                             <table class="table custom-table mb-0" id="cancelled-orders-table">
                                 <thead>
                                     <tr>
-                                        <th>Order Details</th>
+                                        <th>Items Ordered</th>
                                         <th>Receipt No.</th>
                                         <th>Amount</th>
                                         <th>Delivery Date</th>
@@ -488,7 +538,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="details">2 Trays (12 Eggs/Tray) • 24 Eggs Total - Medium</td>
+                                        <td class="details"><div class="order-details-list"><div class="order-detail-item"><strong class="order-detail-product">Medium</strong><span class="order-detail-quantity">2 trays × 12 eggs</span><span class="order-detail-total">24 eggs total</span></div></div></td>
                                         <td class="receipt">REC-2026-C01</td>
                                         <td class="amount font-weight-bold">₱ 196.00</td>
                                         <td class="date">2026-09-24</td>
@@ -497,6 +547,39 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card content-card mb-4 order-card-wrapper" data-status="returns">
+                    <div class="card-header bg-white py-3">
+                        <h2 class="mb-0 font-weight-bold text-dark"><i class="fas fa-egg mr-2 text-warning" aria-hidden="true"></i>Customer Return Requests</h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table custom-table mb-0" id="return-requests-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Receipt No.</th>
+                                        <th>Egg Size</th>
+                                        <th>Eggs</th>
+                                        <th>Next-order Credit</th>
+                                        <th>Requested</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="7" class="text-center text-muted">Loading return requests...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="order-management-pagination" id="returns-orders-pagination" aria-label="Customer return request pages" hidden>
+                            <span class="order-management-page-status" aria-live="polite"></span>
+                            <div class="order-management-page-controls">
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-prev" disabled>Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm order-management-page-next" disabled>Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -576,6 +659,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="staff.js"></script>
+    <script src="staff.js?v=8"></script>
 </body>
 </html>

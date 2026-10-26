@@ -1,6 +1,6 @@
 // Add to the static pages that need a login: <script src="auth-guard.js" data-role="staff"></script>
 // (data-role is "staff" or "customer"). Sends visitors who are not logged in back to the login modal.
-// This only hides pages in the browser; the PHP maintenance pages enforce the role on the server.
+// Static-page visibility is client-side; API endpoints must enforce authorization themselves.
 (function () {
   var role = document.currentScript.getAttribute('data-role');
   document.documentElement.style.visibility = 'hidden';
@@ -15,5 +15,5 @@
       }
       document.documentElement.style.visibility = '';
     })
-    .catch(function () { document.documentElement.style.visibility = ''; });
+    .catch(function () { window.location.replace('Index.html?login=1'); });
 })();

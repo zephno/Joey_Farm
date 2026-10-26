@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  var CART_KEY = "joeysFarmCart";
+  var CART_KEY = null;
+  var currentUser = null;
 
   // ---- 1. Product data ----
   // These are only a fallback. The real list comes from the database (api_products.php),
@@ -59,7 +60,18 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(function () { return false; });
   }
 
-  fetchProducts().then(function () { start(); });
+  Promise.all([
+    fetchProducts(),
+    window.JoeysFarmCartSession.ready
+  ]).then(function (results) {
+    var session = results[1];
+    currentUser = session.loggedIn && session.role === "customer" ? session : null;
+    if (currentUser) CART_KEY = window.JoeysFarmCartSession.cartKey(currentUser);
+    start();
+  }).catch(function (error) {
+    console.error("Could not initialize the customer cart session.", error);
+    fetchProducts().then(function () { start(); });
+  });
 
   function start() {
     if (started) return;
@@ -256,6 +268,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ---- 5. Add to cart (saved in the browser, read by cart.html) ----
     addBtn.addEventListener("click", function () {
+      if (!currentUser) {
+        window.location.href = "Index.html?login=1";
+        return;
+      }
       if (addBtn.disabled) return;
       var tray = selectedTray();
       if (!tray) {

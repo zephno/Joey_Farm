@@ -1,0 +1,7 @@
+# Photos are only served through contact_image.php (staff only).
+<IfModule mod_authz_core.c>
+Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+Deny from all
+</IfModule>

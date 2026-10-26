@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^& 'C:\\\\xampp\\\\php\\\\php\\.exe' -v \\| Select-Object -First 1; Get-ChildItem -Path 'C:\\\\xampp\\\\htdocs\\\\Joey_Farm' -File \\| Measure-Object \\| Select-Object -ExpandProperty Count$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,29 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Joey's Farm | Order Fresh Eggs</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <!-- External CSS Frameworks & Main Styles -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="main.css">
-  <link rel="stylesheet" type="text/css" href="navbar.css">
-  <link rel="stylesheet" type="text/css" href="Order-style.css?v=1.2">
-</head>
+  <head>
+    <title>Joey's Farm</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="Order-style.css">
+    <link rel="stylesheet" type="text/css" href="navbar.css">
+  </head>
 
 <body class="has-fixed-nav">
     <nav class="navbar navbar-expand-md fixed-top navbar-solid">
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
           <span class="navbar-toggler-icon"></span>
-        </button>   
+        </button>
         <div class="collapse navbar-collapse" id="main-navigation">
           <ul class="navbar-nav align-items-center">
             <li class="nav-item">
-              <a class="nav-link nav-outline-text" href="Homepage.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-outline-text" href="customer-orders.html">Profile</a>
+              <a class="nav-link nav-outline-text" href="customer-orders.html">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link nav-outline-text" href="Order.html">Order</a>
@@ -37,150 +32,116 @@
         </ul>
       </div>
     </nav>
+    
 
-  <!-- Product Catalog Section -->
-  <main class="container products my-5" id="productList">
-    <header class="text-center mb-4">
-      <h1 class="products-title">Our Egg Selection</h1>
-      <p class="products-subtitle">Fresh pasture-raised organic eggs delivered straight to your home</p>
-    </header>
+    <div class="container products" id="productList">
+  <div class="feature-title products-title text-center mb-0">Products</div>
+  <div class="row">
 
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/Pewee_Egg.jpg" class="card-img-top" alt="Dozen Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Peewee</h5>
+          <p class="card-text">Petite eggs, ideal for baking and portion control.</p>
+          <a href="Product.html?size=peewee" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/Small_Egg.jpg" class="card-img-top" alt="Half Dozen Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Small</h5>
+          <p class="card-text">Compact eggs with rich flavor, great for everyday cooking.</p>
+          <a href="Product.html?size=small" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/Medium_Egg.jpg" class="card-img-top" alt="Brown Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Medium</h5>
+          <p class="card-text">Balanced size and value, perfect for daily use.</p>
+          <a href="Product.html?size=medium" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/Large_Egg.jpg" class="card-img-top" alt="Jumbo Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Large</h5>
+          <p class="card-text">Great all-purpose size, perfect for cooking and baking.</p>
+          <a href="Product.html?size=large" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/ExtraLarge_Egg.jpg" class="card-img-top" alt="Extra Large Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Extra Large</h5>
+          <p class="card-text">Bigger yolks and whites, great for families and resellers.</p>
+          <a href="Product.html?size=extralarge" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-6 mb-4">
+      <div class="card h-100">
+        <img src="images/Jumbo_Egg.jpg" class="card-img-top" alt="White Eggs">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5">Jumbo</h5>
+          <p class="card-text">Our biggest eggs, packed with rich golden yolks.</p>
+          <a href="Product.html?size=jumbo" class="btn btn-secondary btn-block mt-auto">Order</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="page-footer">
+  <div class="container">
     <div class="row">
 
-      <!-- Peewee -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/Pewee_Egg.jpg" class="card-img-top" alt="Peewee Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Peewee</h2>
-            <p class="product-card-desc">Petite eggs, ideal for quick snacks, recipes, and portion control.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=peewee" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
+      <div class="col-lg-8 col-md-8 col-sm-12">
+        <div class="text-uppercase font-weight-bold">Joey's Farm</div>
+        <p>
+        Joey's Farm is committed to sustainable agriculture and high-quality local produce.
+        We take pride in raising happy, pasture-fed hens to supply fresh, ethically sourced
+        organic eggs directly to kitchens across the community.
+        </p>
       </div>
 
-      <!-- Small -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/Small_Egg.jpg" class="card-img-top" alt="Small Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Small</h2>
-            <p class="product-card-desc">Compact eggs with rich flavor, great for daily breakfast and everyday cooking.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=small" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Medium -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/Medium_Egg.jpg" class="card-img-top" alt="Medium Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Medium</h2>
-            <p class="product-card-desc">Balanced size and great value, perfect for everyday family meals.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=medium" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Large -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/Large_Egg.jpg" class="card-img-top" alt="Large Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Large</h2>
-            <p class="product-card-desc">Versatile, all-purpose size standard for baking and gourmet dishes.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=large" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Extra Large -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/ExtraLarge_Egg.jpg" class="card-img-top" alt="Extra Large Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Extra Large</h2>
-            <p class="product-card-desc">Bigger yolks and whites, perfect for larger families and cooking.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=extralarge" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Jumbo -->
-      <div class="col-lg-4 col-md-6 col-12 mb-4">
-        <div class="card product-card h-100">
-          <div class="product-img-wrapper">
-            <img src="images/Jumbo_Egg.jpg" class="card-img-top" alt="Jumbo Eggs">
-            <span class="stock-badge badge-in-stock" style="display:none;">In Stock</span>
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h2 class="product-card-title">Jumbo</h2>
-            <p class="product-card-desc">Our largest egg size, packed with rich golden yolks for premium taste.</p>
-            <div class="stock-breakdown mb-3"></div>
-            <a href="Product.html?size=jumbo" class="btn btn-order btn-block mt-auto">Select Size</a>
-          </div>
-        </div>
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <div class="text-uppercase font-weight-bold">Contact</div>
+        <p>
+          Address
+          +63 ***-****-***
+          joeyfarm@gmail.com
+        </p>
       </div>
 
     </div>
-  </main>
 
-  <!-- Page Footer -->
-  <footer class="page-footer mt-auto">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-12 mb-3">
-          <h5 class="text-uppercase">Joey's Farm</h5>
-          <p>
-            Joey's Farm is committed to sustainable agriculture and high-quality local produce.
-            We take pride in raising happy, pasture-fed hens to supply fresh, ethically sourced
-            organic eggs directly to kitchens across the community.
-          </p>
-        </div>
-
-        <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
-          <h5 class="text-uppercase">Contact Us</h5>
-          <p class="mb-0">
-            Address: Farm Region, PH<br>
-            Phone: +63 900-000-0000<br>
-            Email: joeyfarm@gmail.com
-          </p>
-        </div>
-      </div>
-
-      <div class="footer-copyright text-center">
-        © 2026 Copyright: Group 3 - The Good Team
-      </div>
+    <div class="footer-copyright text-center">
+      © 2026 Copyright: Group 3 - The Good Team
     </div>
-  </footer>
+  </div>
+</footer>
 
-  <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  <script src="main.js"></script>
-  <script src="order-products.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="main.js"></script>
+<script src="order-products.js"></script>
 
 </body>
 </html>

@@ -77,6 +77,11 @@ body {
 }
 
 /* Account Page Title */
+.account-page-container {
+    width: 100%;
+    max-width: 1120px;
+}
+
 .account-page-title {
     font-weight: 700;
     color: var(--primary-brown);
@@ -88,13 +93,19 @@ body {
 /* Cards & Containers */
 .customer-details-card,
 .order-history-card {
+    width: 100%;
+    max-width: none;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
     transition: box-shadow 0.3s ease;
+}
+
+.order-history-card {
+    margin-top: 1.25rem !important;
 }
 
 .customer-details-card:hover,
@@ -172,9 +183,75 @@ body {
     color: #ffffff;
 }
 
+#customer-details-form .text-right {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.customer-action-button {
+    display: inline-flex;
+    flex: 0 0 190px;
+    width: 190px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+}
+
+.order-history-table .btn {
+    display: inline-flex;
+    width: 145px;
+    min-width: 145px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.65rem;
+    white-space: nowrap;
+}
+
+.btn-report-return {
+    background-color: #e69500;
+    border: 1px solid #e69500;
+    color: #2b1e16;
+    font-weight: 600;
+}
+
+.btn-report-return:hover,
+.btn-report-return:focus {
+    background-color: #cc8400;
+    border-color: #cc8400;
+    color: #ffffff;
+}
+
 /* Order History Table */
 .order-history-table {
     margin-bottom: 0;
+}
+
+.customer-order-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.customer-order-pagination[hidden] {
+    display: none;
+}
+
+.customer-order-page-status {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.customer-order-page-controls {
+    display: flex;
+    gap: 0.5rem;
 }
 
 .order-history-table thead th {
@@ -193,6 +270,54 @@ body {
     padding: 1rem;
     color: #333;
     font-size: 0.95rem;
+}
+
+.order-history-table td.order-details-cell {
+    min-width: 300px;
+    white-space: normal;
+}
+
+.customer-order-items {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 440px;
+}
+
+.customer-order-item {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid #e8e2d9;
+    border-left: 4px solid var(--accent-gold);
+    border-radius: 7px;
+    background: #fffdfa;
+}
+
+.customer-order-item-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+}
+
+.customer-order-product {
+    color: var(--dark-brown);
+    font-size: 0.96rem;
+    font-weight: 700;
+}
+
+.customer-order-eggs {
+    color: #344a31;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.customer-order-quantity {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
 }
 
 .order-history-table tbody tr {
@@ -245,6 +370,11 @@ body {
     padding: 1.25rem 1.5rem;
 }
 
+#reportBrokenModal .modal-header.bg-light {
+    background-color: var(--primary-brown) !important;
+    border-color: var(--dark-brown);
+}
+
 #loginModal .modal-title {
     font-weight: 700;
     font-size: 1.25rem;
@@ -264,5 +394,14 @@ body {
     .customer-details-card,
     .order-history-card {
         padding: 1.25rem;
+    }
+
+    .order-history-table .btn {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .order-history-table td.order-details-cell {
+        min-width: 250px;
     }
 }

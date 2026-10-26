@@ -6,7 +6,6 @@ require __DIR__ . '/includes/layout.php';
 $me  = require_login('staff');
 $pdo = db();
 
-/* ------------------------------ ADD / EDIT / DELETE ------------------------------ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $action = $_POST['action'] ?? '';
@@ -44,7 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($f['name'] === '') $errors[] = 'Name is required.';
         if (!filter_var($f['email'], FILTER_VALIDATE_EMAIL)) $errors[] = 'Enter a valid email address.';
         if (!in_array($f['role'], ['customer', 'staff'], true)) $errors[] = 'Invalid role.';
-        if ($f['contact'] !== '' && !preg_match('/^[0-9]{8}$/', $f['contact'])) $errors[] = 'Contact number must be exactly 8 digits.';
+        if ($f['contact'] !== '' && !preg_match('/^09[0-9]{9}$/', $f['contact'])) {
+            $errors[] = 'Contact number must be exactly 11 digits starting with 09 (e.g. 09123456789).';
+        }
         if ($action === 'add' && strlen($pass) < 6) $errors[] = 'Password must be at least 6 characters.';
         if ($action === 'edit' && $pass !== '' && strlen($pass) < 6) $errors[] = 'New password must be at least 6 characters.';
 
@@ -52,19 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dup = $pdo->prepare('SELECT 1 FROM users WHERE email = ? AND id <> ?');
             $dup->execute([$f['email'], $id]);
             if ($dup->fetchColumn()) $errors[] = 'That email is already used by another account.';
-        }
-
-        if (!$errors && $action === 'edit' && $id === $me['id'] && $f['role'] !== 'staff') {
-            $errors[] = 'You cannot remove your own staff role.';
-        }
-        if (!$errors && $action === 'edit') {
-            $cur = $pdo->prepare('SELECT role FROM users WHERE id = ?');
-            $cur->execute([$id]);
-            $curRole = $cur->fetchColumn();
-            if ($curRole === 'staff' && $f['role'] !== 'staff'
-                && (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='staff'")->fetchColumn() <= 1) {
-                $errors[] = 'There must be at least one staff account.';
-            }
         }
 
         if ($errors) {
@@ -94,7 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-/* ------------------------------ LOAD DATA ------------------------------ */
 $editing = null;
 if (isset($_GET['edit'])) {
     $s = $pdo->prepare('SELECT id, name, email, role, address, contact FROM users WHERE id = ?');
@@ -139,7 +126,7 @@ staff_header('User Maintenance', 'users');
                 </div>
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold" for="email">Email Address</label>
-                    <input type="email" class="form-control table-input" id="email" name="email" value="<?= $v('email') ?>" required>
+                    <input type="email" class="form-control table-input" id="email" name="email" placeholder="e.g. name@example.com" value="<?= $v('email') ?>" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold" for="role">Role</label>
@@ -157,8 +144,8 @@ staff_header('User Maintenance', 'users');
                     <input class="form-control table-input" id="address" name="address" value="<?= $v('address') ?>">
                 </div>
                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold" for="contact">Contact No. (8 digits)</label>
-                    <input class="form-control table-input" id="contact" name="contact" maxlength="8" pattern="[0-9]{8}" value="<?= $v('contact') ?>">
+                    <label class="font-weight-bold" for="contact">Contact No. (11 digits, 09XXXXXXXXX)</label>
+                    <input type="tel" class="form-control table-input" id="contact" name="contact" maxlength="11" pattern="09[0-9]{9}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="09123456789" value="<?= $v('contact') ?>" title="Must be 11 digits starting with 09">
                 </div>
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold" for="password"><?= $isEdit ? 'New Password (optional)' : 'Password' ?></label>
