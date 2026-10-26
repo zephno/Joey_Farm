@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 require __DIR__ . '/includes/stock.php';
+require __DIR__ . '/includes/discounts.php';
 
 $me = current_user();
 if (!$me) json_out(['error' => 'Please log in first.'], 401);
@@ -15,6 +16,8 @@ try {
 } catch (Throwable $e) {
     try { $pdo->exec('ALTER TABLE orders ADD COLUMN completed_at DATETIME NULL'); } catch (Throwable $e2) { /* ignore */ }
 }
+
+ensure_discount_schema($pdo);
 
 /** Load orders (optionally only one user's) with a ready-to-display "details" line. */
 function load_orders(PDO $pdo, ?int $userId): array
@@ -43,6 +46,11 @@ function load_orders(PDO $pdo, ?int $userId): array
             $tray = (int)$i['tray_size'];
             $lines[] = $qty . ($qty === 1 ? ' Tray' : ' Trays') . " ($tray Eggs/Tray) • " . ($qty * $tray) . ' Eggs Total - ' . $i['title'];
         }
+        $discPct = (int)($o['discount_percent'] ?? 0);
+        $discAmt = (float)($o['discount_amount'] ?? 0);
+        if ($discPct > 0) {
+            $lines[] = $discPct . '% cracked-egg discount (-₱' . number_format($discAmt, 2) . ')';
+        }
         $out[] = [
             'id'            => (int)$o['id'],
             'details'       => implode(' | ', $lines),
@@ -54,6 +62,8 @@ function load_orders(PDO $pdo, ?int $userId): array
             'created_at'    => $o['created_at'],
             'completed_at'  => $o['completed_at'] ?? null,
             'customer'      => $o['customer_name'],
+            'discount_percent' => $discPct,
+            'discount_amount'  => $discAmt,
         ];
     }
     return $out;
@@ -121,11 +131,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->beginTransaction();
         try {
-            $pdo->prepare('INSERT INTO orders (receipt_no, user_id, customer_name, address, contact, payment, total, delivery_date, status, remark, created_at)
-                           VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+            // A staff-verified cracked-egg report earns a flat discount on the next order.
+            // The server decides this; the browser never sends a discount.
+            $grant = next_unused_grant($pdo, (int)$me['id']);
+            $discPct = $grant ? (int)$grant['percent'] : 0;
+            $discAmt = $discPct > 0 ? round($total * $discPct / 100, 2) : 0.0;
+            $total   = round($total - $discAmt, 2);
+
+            $pdo->prepare('INSERT INTO orders (receipt_no, user_id, customer_name, address, contact, payment, total, delivery_date, status, remark, created_at, discount_percent, discount_amount)
+                           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
                 ->execute(['TMP-' . bin2hex(random_bytes(6)), $me['id'], $d['name'], $d['address'], $d['contact'], $d['payment'],
-                           $total, date('Y-m-d', strtotime('+2 days')), 'pending', '', date('Y-m-d H:i:s')]);
+                           $total, date('Y-m-d', strtotime('+2 days')), 'pending', '', date('Y-m-d H:i:s'), $discPct, $discAmt]);
             $orderId = (int)$pdo->lastInsertId();
+            if ($grant) {
+                // Only succeeds if nobody else used this discount in the meantime.
+                $use = $pdo->prepare('UPDATE discount_grants SET used_order_id = ? WHERE id = ? AND used_order_id IS NULL');
+                $use->execute([$orderId, (int)$grant['id']]);
+                if (!$use->rowCount()) {
+                    $pdo->rollBack();
+                    json_out(['error' => 'Your discount was just used on another order. Please place the order again.'], 409);
+                }
+            }
             $receipt = 'REC-' . date('Y') . '-' . str_pad((string)$orderId, 3, '0', STR_PAD_LEFT);
             $pdo->prepare('UPDATE orders SET receipt_no = ? WHERE id = ?')->execute([$receipt, $orderId]);
 
@@ -138,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->rollBack();
             json_out(['error' => 'Could not save your order. Please try again.'], 500);
         }
-        json_out(['ok' => true, 'receipt' => $receipt, 'total' => $total]);
+        json_out(['ok' => true, 'receipt' => $receipt, 'total' => $total, 'discount_percent' => $discPct, 'discount_amount' => $discAmt]);
     }
 
     if ($action === 'cancel') {
@@ -151,6 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->execute([$id, $me['id']]);
         }
         if (!$st->rowCount()) json_out(['error' => 'This order can no longer be cancelled.'], 409);
+        // A cancelled order gives its discount back so the customer can use it on the next order.
+        $pdo->prepare('UPDATE discount_grants SET used_order_id = NULL WHERE used_order_id = ?')->execute([$id]);
         json_out(['ok' => true]);
     }
 
@@ -268,6 +296,27 @@ if ($scope === 'all') {
         if (substr($day, 0, 7) === $month)  $sales['monthly'] += $o['total'];
     }
     json_out(['orders' => $orders, 'sales' => $sales]);
+}
+
+if ($scope === 'reportable') {
+    // Delivered orders this customer can still report (no verified report yet).
+    if ($isStaff) json_out(['orders' => []]);
+    $st = $pdo->prepare("SELECT id, receipt_no, completed_at, created_at, total FROM orders
+                         WHERE user_id = ? AND status = 'completed'
+                           AND id NOT IN (SELECT order_id FROM discount_grants WHERE order_id IS NOT NULL)
+                         ORDER BY id DESC");
+    $st->execute([(int)$me['id']]);
+    $list = [];
+    foreach ($st->fetchAll() as $o) {
+        $list[] = ['id' => (int)$o['id'], 'receipt' => $o['receipt_no'],
+                   'date' => substr((string)($o['completed_at'] ?: $o['created_at']), 0, 10), 'total' => (float)$o['total']];
+    }
+    json_out(['orders' => $list]);
+}
+
+if ($scope === 'discount') {
+    $g = $isStaff ? null : next_unused_grant($pdo, (int)$me['id']);
+    json_out(['available' => (bool)$g, 'percent' => $g ? (int)$g['percent'] : 0]);
 }
 
 json_out(['orders' => load_orders($pdo, $me['id'])]);

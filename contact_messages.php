@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
+require __DIR__ . '/includes/discounts.php';
 
 require_xhr();
 $me = current_user();
@@ -8,6 +9,7 @@ if (!$me) json_out(['error' => 'Please log in first.'], 401);
 
 $pdo = db();
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+ensure_discount_schema($pdo);
 
 /* Every message must carry a photo, so the table needs somewhere to remember it.
    Added automatically the first time this runs (same idea as orders.completed_at). */
@@ -18,7 +20,14 @@ try {
     try { $pdo->exec('ALTER TABLE contact_messages ADD COLUMN image_mime VARCHAR(30) NULL'); } catch (Throwable $e2) { /* ignore */ }
 }
 
-const CONTACT_MAX_IMAGE_BYTES = 10 * 1024 * 1024;   // matches PHP's default upload_max_filesize (2M)
+// A report can name the (delivered) order it is about, so a discount can only be given once per order.
+try {
+    $pdo->query('SELECT order_id FROM contact_messages LIMIT 1');
+} catch (Throwable $e) {
+    try { $pdo->exec('ALTER TABLE contact_messages ADD COLUMN order_id INT UNSIGNED NULL'); } catch (Throwable $e2) { /* ignore */ }
+}
+
+const CONTACT_MAX_IMAGE_BYTES = 2 * 1024 * 1024;   // matches PHP's default upload_max_filesize (2M)
 const CONTACT_IMAGE_TYPES = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
 if ($method === 'POST') {
@@ -26,7 +35,7 @@ if ($method === 'POST') {
     if (empty($_POST) && empty($_FILES)
         && str_starts_with((string)($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/form-data')
         && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
-        json_out(['error' => 'That photo is too large. Please choose one under 10 MB.'], 413);
+        json_out(['error' => 'That photo is too large. Please choose one under 2 MB.'], 413);
     }
 
     // New messages arrive as multipart form data (they carry a photo); staff actions arrive as JSON.
@@ -57,6 +66,20 @@ if ($method === 'POST') {
         $characterCount = preg_match_all('/./us', $message);
         if ($characterCount === false || $characterCount > 5000) {
             json_out(['error' => 'Please enter a message of up to 5,000 characters.'], 422);
+        }
+
+        /* ---- the order this report is about (optional for general messages) ---- */
+        $orderId = null;
+        $orderRaw = $body['order_id'] ?? '';
+        if ($orderRaw !== '' && $orderRaw !== null) {
+            $orderId = filter_var($orderRaw, FILTER_VALIDATE_INT);
+            if (!$orderId || $orderId < 1) json_out(['error' => 'Please choose one of your delivered orders.'], 422);
+            $o = $pdo->prepare("SELECT id FROM orders WHERE id = ? AND user_id = ? AND status = 'completed'");
+            $o->execute([$orderId, (int)$me['id']]);
+            if (!$o->fetch()) json_out(['error' => 'Please choose one of your delivered orders.'], 422);
+            $dup = $pdo->prepare('SELECT 1 FROM discount_grants WHERE order_id = ?');
+            $dup->execute([$orderId]);
+            if ($dup->fetch()) json_out(['error' => 'A report for this order has already been verified.'], 409);
         }
 
         /* ---- the required photo ---- */
@@ -96,9 +119,9 @@ if ($method === 'POST') {
 
         try {
             $stmt = $pdo->prepare(
-                'INSERT INTO contact_messages (user_id, sender_name, sender_email, message, image_file, image_mime) VALUES (?, ?, ?, ?, ?, ?)'
+                'INSERT INTO contact_messages (user_id, sender_name, sender_email, message, image_file, image_mime, order_id) VALUES (?, ?, ?, ?, ?, ?, ?)'
             );
-            $stmt->execute([(int)$me['id'], $name, $email, $message, $stored, $mime]);
+            $stmt->execute([(int)$me['id'], $name, $email, $message, $stored, $mime, $orderId]);
         } catch (Throwable $e) {
             @unlink($dir . '/' . $stored);      // no orphan photos if the message could not be saved
             json_out(['error' => 'Could not send your message. Please try again.'], 500);
@@ -106,12 +129,39 @@ if ($method === 'POST') {
         json_out(['ok' => true, 'id' => (int)$pdo->lastInsertId()], 201);
     }
 
-    if (!in_array($action, ['mark_read', 'archive'], true)) {
+    if (!in_array($action, ['mark_read', 'archive', 'grant_discount'], true)) {
         json_out(['error' => 'Unknown action.'], 400);
     }
     if ($me['role'] !== 'staff') json_out(['error' => 'Staff only.'], 403);
     $id = filter_var($body['id'] ?? null, FILTER_VALIDATE_INT);
     if (!$id || $id < 1) json_out(['error' => 'Invalid message.'], 422);
+
+    if ($action === 'grant_discount') {
+        // Staff have looked at the photo and confirm the eggs were really cracked:
+        // the customer gets a flat discount on their next order (once per report).
+        $m = $pdo->prepare('SELECT id, user_id, order_id FROM contact_messages WHERE id = ?');
+        $m->execute([$id]);
+        $msg = $m->fetch();
+        if (!$msg) json_out(['error' => 'Message not found.'], 404);
+        if (!$msg['user_id']) json_out(['error' => 'This message has no customer account to give a discount to.'], 422);
+        if (!$msg['order_id']) json_out(['error' => 'This message is not linked to an order, so no discount can be given.'], 422);
+        // The order must really be one of this customer's delivered orders.
+        $o = $pdo->prepare("SELECT id FROM orders WHERE id = ? AND user_id = ? AND status = 'completed'");
+        $o->execute([(int)$msg['order_id'], (int)$msg['user_id']]);
+        if (!$o->fetch()) json_out(['error' => 'The linked order is not a delivered order of this customer.'], 422);
+        $dup = $pdo->prepare('SELECT 1 FROM discount_grants WHERE order_id = ?');
+        $dup->execute([(int)$msg['order_id']]);
+        if ($dup->fetch()) json_out(['error' => 'A report for this order was already verified. Only one discount per order.'], 409);
+        try {
+            $pdo->prepare('INSERT INTO discount_grants (user_id, message_id, order_id, percent, granted_by) VALUES (?, ?, ?, ?, ?)')
+                ->execute([(int)$msg['user_id'], $id, (int)$msg['order_id'], REPORT_DISCOUNT_PERCENT, (int)$me['id']]);
+        } catch (Throwable $e) {
+            json_out(['error' => 'A discount was already given for this report or for this order.'], 409);
+        }
+        $pdo->prepare("UPDATE contact_messages SET status = 'read', read_at = COALESCE(read_at, CURRENT_TIMESTAMP) WHERE id = ? AND status = 'unread'")
+            ->execute([$id]);
+        json_out(['ok' => true]);
+    }
 
     if ($action === 'mark_read') {
         $stmt = $pdo->prepare(
@@ -136,11 +186,18 @@ if ($me['role'] !== 'staff') json_out(['error' => 'Staff only.'], 403);
 
 $stmt = $pdo->query(
     'SELECT id, sender_name, sender_email, message, status, created_at, read_at,
-            CASE WHEN image_file IS NULL THEN 0 ELSE 1 END AS has_image
+            CASE WHEN image_file IS NULL THEN 0 ELSE 1 END AS has_image,
+            (SELECT COUNT(*) FROM discount_grants g WHERE g.message_id = contact_messages.id) AS discount_granted,
+            contact_messages.order_id AS order_id,
+            (SELECT o.receipt_no FROM orders o WHERE o.id = contact_messages.order_id) AS order_receipt,
+            (SELECT COUNT(*) FROM discount_grants g2 WHERE g2.order_id = contact_messages.order_id) AS order_discounted
      FROM contact_messages ORDER BY created_at DESC, id DESC'
 );
 $rows = $stmt->fetchAll();
 foreach ($rows as &$r) {
+    $r['discount_granted'] = (int)$r['discount_granted'] > 0;
+    $r['order_discounted'] = (int)$r['order_discounted'] > 0;      // some report for this order was already verified
+    $r['order_id'] = $r['order_id'] !== null ? (int)$r['order_id'] : null;
     $r['has_image'] = (bool)$r['has_image'];     // the file name itself is never sent to the browser
 }
 unset($r);

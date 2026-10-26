@@ -79,10 +79,26 @@
         </div>
 
         <!-- Order History Card -->
-        <div class="order-history-card mx-auto mt-4" style="max-width: 1000px;">
+        <div class="order-history-card mx-auto mt-4" style="max-width: 1100px;">
             <h2 id="order-history-heading" class="card-section-title mb-4">
                 Order History
             </h2>
+
+            <!-- Report cracked eggs: takes the customer to the contact form, which needs a photo as proof -->
+            <div id="discount-notice" class="alert alert-success" hidden></div>
+      <div id="report-cracked-eggs" class="d-flex flex-wrap align-items-center justify-content-between p-3 mb-3 rounded border bg-light">
+                <div class="mr-3 mb-2 mb-md-0">
+                    <div class="font-weight-bold">Received cracked or broken eggs?</div>
+                    <div class="small text-muted">
+                        Send us a report with your receipt number.
+                        <span class="badge badge-warning ml-1"><i class="fas fa-camera mr-1"></i>Photo proof required</span>
+                        Reports without a clear photo of the cracked eggs cannot be sent.
+                    </div>
+                </div>
+                <a class="btn btn-confirm" id="report-cracked-btn" href="Homepage.html?report=1#formDesign">
+                    <i class="fas fa-egg mr-1"></i> Report Cracked Egg
+                </a>
+            </div>
             
             <div class="table-responsive">
                 <table class="table table-hover order-history-table">
@@ -93,6 +109,7 @@
                             <th scope="col">Amount</th>
                             <th scope="col">Delivery Date</th>
                             <th scope="col">Status</th>
+                            <th scope="col">Remarks</th>
                             <th scope="col" class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -103,6 +120,7 @@
                             <td class="text-muted">—</td>
                             <td class="text-muted">—</td>
                             <td><span class="badge badge-status badge-status-pending">No Orders</span></td>
+                            <td class="text-muted">—</td>
                             <td class="text-center">
                                 <button class="btn btn-outline-danger btn-cancel btn-sm" type="button" disabled>Cancel</button>
                             </td>

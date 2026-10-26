@@ -48,6 +48,12 @@
   var detailsForm = document.getElementById('customer-details-form');
 
   if (finalizeBtn && detailsForm) {
+    // Tell the customer about a waiting discount (the server applies it when the order is placed).
+    api('orders.php?scope=discount').then(function (d) {
+      if (!d.available) return;
+      var note = el('div', 'alert alert-success', 'You have a ' + d.percent + '% discount from a verified cracked-egg report. It will be applied to this order automatically.');
+      detailsForm.parentNode.insertBefore(note, detailsForm);
+    }).catch(function () {});
     finalizeBtn.addEventListener('click', function (e) {
       e.preventDefault();
       if (finalizeBtn.classList.contains('disabled')) return;
@@ -74,7 +80,8 @@
         cart: cart.map(function (c) { return { size: c.size, tray: c.tray, qty: c.qty }; })
       }).then(function (res) {
         try { localStorage.removeItem(CART_KEY); } catch (err) { /* ignore */ }
-        alert('Order placed! Your receipt number is ' + res.receipt + '.');
+        alert('Order placed! Your receipt number is ' + res.receipt + '.' +
+          (res.discount_percent ? '\nYour ' + res.discount_percent + '% cracked-egg discount was applied (-' + peso(res.discount_amount) + ').' : ''));
         window.location.href = 'customer-orders.html';
       }).catch(function (err) {
         finalizeBtn.classList.remove('disabled');
@@ -95,7 +102,7 @@
       if (!orders.length) {
         var empty = el('tr');
         var td = el('td', 'text-center text-muted', 'You have no orders yet.');
-        td.colSpan = 6;
+        td.colSpan = 7;
         empty.appendChild(td);
         tbody.appendChild(empty);
         return;
@@ -108,6 +115,8 @@
         tr.appendChild(el('td', '', peso(o.total)));
         tr.appendChild(el('td', '', o.delivery_date));
         tr.appendChild(el('td', '', statusLabel[o.status] || o.status));
+        // Staff remarks are shown for every status (pending, confirmed, delivered, cancelled).
+        tr.appendChild(el('td', o.remark ? '' : 'text-muted', o.remark || '—'));
 
         var action = el('td');
         if (o.status === 'pending') {
@@ -133,6 +142,17 @@
       return api('orders.php?scope=mine').then(function (res) { render(res.orders); }).catch(function () {});
     };
 
+    api('orders.php?scope=discount').then(function (d) {
+      var box = document.getElementById('discount-notice');
+      if (box && d.available) {
+        box.textContent = 'Good news! A staff-verified cracked-egg report earned you a ' + d.percent + '% discount on your next order. It is applied automatically when you place it.';
+        box.hidden = false;
+      }
+    }).catch(function () {});
+
     load();
+    // Pick up new staff remarks without a page refresh.
+    setInterval(load, 30000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
   }
 })();

@@ -214,6 +214,27 @@ $(document).ready(function () {
                 .append($('<small class="form-text text-muted">').text('Click the photo to open it full size.'));
         }
 
+        // Staff verify the cracked-egg report -> customer gets a flat 10% off their next order.
+        var $disc = $('#message-discount');
+        if (!$disc.length) {
+            $disc = $('<div id="message-discount" class="mt-3"></div>').insertAfter('#message-photo');
+        }
+        $disc.empty();
+        $disc.append($('<div class="small mb-2">').append($('<strong>').text('Order: '))
+            .append(document.createTextNode(message.order_receipt || 'not linked to an order')));
+        if (message.discount_granted) {
+            $disc.append($('<span class="badge badge-success p-2">').text('✔ Report verified: 10% discount given for the next order'));
+        } else if (!message.order_id) {
+            $disc.append($('<small class="form-text text-muted">').text('No order is linked to this message, so no discount can be given.'));
+        } else if (message.order_discounted) {
+            $disc.append($('<span class="badge badge-secondary p-2">').text('A report for this order was already verified. No second discount.'));
+        } else {
+            $disc.append($('<button type="button" class="btn btn-success btn-sm message-grant-discount">')
+                    .text('Verify report & give 10% discount'))
+                .append($('<small class="form-text text-muted">').text(
+                    'Only click this after checking that the photo really shows cracked eggs. One discount per order.'));
+        }
+
         $('#message-action-error').prop('hidden', true).text('');
         $('.message-mark-read').prop('hidden', message.status !== 'unread');
         $('.message-archive').prop('hidden', message.status === 'archived');
@@ -239,6 +260,11 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-view-message', function () {
         showContactMessage($(this).data('message-id'));
+    });
+
+    $(document).on('click', '.message-grant-discount', function () {
+        if (!confirm('Verify this report and give the customer 10% off their next order?')) return;
+        updateContactMessage('grant_discount');
     });
 
     $('.message-mark-read').on('click', function () {
