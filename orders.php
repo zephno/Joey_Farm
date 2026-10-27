@@ -15,6 +15,8 @@ try {
     try { $pdo->exec('ALTER TABLE orders ADD COLUMN completed_at DATETIME NULL'); } catch (Throwable $e2) { /* ignore */ }
 }
 
+ensure_return_message_column($pdo);
+
 function load_orders(PDO $pdo, ?int $userId): array
 {
     if ($userId !== null) {
@@ -43,6 +45,20 @@ function load_orders(PDO $pdo, ?int $userId): array
         $returnedByOrder[(int)$row['order_id']][$row['size_key']] = (int)$row['returned_eggs'];
     }
 
+    // Each order can only be reported once: any report (even a rejected one) uses it up.
+    $reportedSt = $pdo->prepare("SELECT DISTINCT order_id FROM egg_returns WHERE order_id IN ($in)");
+    $reportedSt->execute($ids);
+    $reportedOrders = array_flip(array_map('intval', $reportedSt->fetchAll(PDO::FETCH_COLUMN)));
+
+    // The result of each reported egg size (pending / approved / rejected) plus the optional staff note.
+    $updatesSt = $pdo->prepare(
+        "SELECT order_id, size_key, broken_qty, discount_amount, status, staff_message FROM egg_returns
+         WHERE order_id IN ($in) ORDER BY id"
+    );
+    $updatesSt->execute($ids);
+    $updatesByOrder = [];
+    foreach ($updatesSt->fetchAll() as $row) $updatesByOrder[(int)$row['order_id']][] = $row;
+
     $out = [];
     foreach ($orders as $o) {
         $lines = [];
@@ -64,13 +80,24 @@ function load_orders(PDO $pdo, ?int $userId): array
             $purchasedBySize[$key]['eggs'] = ($purchasedBySize[$key]['eggs'] ?? 0) + $qty * $tray;
         }
         $returnable = [];
-        if ($o['status'] === 'completed') {
+        $isReported = isset($reportedOrders[(int)$o['id']]);
+        if ($o['status'] === 'completed' && !$isReported) {
             foreach ($purchasedBySize as $key => $purchased) {
                 $available = $purchased['eggs'] - ($returnedByOrder[(int)$o['id']][$key] ?? 0);
                 if ($available > 0) {
                     $returnable[$key] = ['title' => $purchased['title'], 'eggs' => $available];
                 }
             }
+        }
+        $reportUpdates = [];
+        foreach ($updatesByOrder[(int)$o['id']] ?? [] as $u) {
+            $reportUpdates[] = [
+                'title'           => $purchasedBySize[$u['size_key']]['title'] ?? $u['size_key'],
+                'broken_qty'      => (int)$u['broken_qty'],
+                'discount_amount' => (float)$u['discount_amount'],
+                'status'          => $u['status'],
+                'staff_message'   => $u['staff_message'],
+            ];
         }
         $out[] = [
             'id'            => (int)$o['id'],
@@ -86,6 +113,8 @@ function load_orders(PDO $pdo, ?int $userId): array
             'completed_at'  => $o['completed_at'] ?? null,
             'customer'      => $o['customer_name'],
             'returnable'    => $returnable,
+            'reported'      => $isReported,
+            'report_updates'=> $reportUpdates,
         ];
     }
     return $out;
@@ -93,7 +122,16 @@ function load_orders(PDO $pdo, ?int $userId): array
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_xhr();
-    $b = json_body();
+
+    // A photo bigger than PHP's post_max_size arrives as an EMPTY multipart request.
+    if (empty($_POST) && empty($_FILES)
+        && str_starts_with((string)($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/form-data')
+        && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        json_out(['error' => 'That photo is too large. Please choose one under 2 MB.'], 413);
+    }
+
+    // Broken-egg reports arrive as multipart form data (they carry a photo); everything else is JSON.
+    $b = !empty($_POST) ? $_POST : json_body();
     $action = (string)($b['action'] ?? '');
     $id = (int)($b['id'] ?? 0);
 
@@ -245,19 +283,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'report_return') {
         if ($me['role'] !== 'customer') json_out(['error' => 'Customer accounts only.'], 403);
-        $orderId   = (int)($b['order_id'] ?? 0);
-        $sizeKey   = strtolower(trim((string)($b['size_key'] ?? '')));
-        $brokenQty = (int)($b['broken_qty'] ?? 0);
+        $orderId = (int)($b['order_id'] ?? 0);
+
+        // Multipart forms can't nest data, so the browser sends the sizes as a JSON string.
+        $rawItems = $b['items'] ?? null;
+        if (is_string($rawItems)) $rawItems = json_decode($rawItems, true);
+        if (!is_array($rawItems)) {
+            json_out(['error' => 'Please select at least one egg size to report.'], 422);
+        }
 
         try {
-            $discountAmount = create_broken_egg_return($pdo, (int)$me['id'], $orderId, $sizeKey, $brokenQty);
+            // One photo for the whole report; one return row per egg size. Staff can see the photo before approving.
+            $discountAmount = report_broken_eggs($pdo, (int)$me['id'], $orderId, $rawItems, $_FILES['image'] ?? null);
         } catch (DomainException $e) {
             json_out(['error' => $e->getMessage()], 422);
         } catch (Throwable $e) {
             json_out(['error' => 'Could not submit the return request. Please try again.'], 500);
         }
 
-        json_out(['ok' => true, 'message' => 'Return request submitted. Once approved, ₱' . number_format($discountAmount, 2) . ' credit will apply to your next order.']);
+        json_out(['ok' => true, 'message' => 'Return request submitted. Once approved, ₱' . number_format($discountAmount, 2) . ' credit will apply to your next order, for the same egg sizes you reported.']);
     }
 
     if (!$isStaff) json_out(['error' => 'Staff only.'], 403);
@@ -333,6 +377,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (in_array($action, ['approve_return', 'reject_return'], true)) {
         $returnId = (int)($b['return_id'] ?? $id);
+        // Optional note shown to the customer next to the result of their report.
+        $staffMessage = mb_substr(trim((string)($b['message'] ?? '')), 0, 500);
+        if ($staffMessage === '') $staffMessage = null;
         $pdo->beginTransaction();
         try {
             $st = $pdo->prepare("SELECT * FROM egg_returns WHERE id = ? AND status = 'pending' FOR UPDATE");
@@ -344,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($action === 'reject_return') {
-                $pdo->prepare("UPDATE egg_returns SET status = 'rejected' WHERE id = ?")->execute([$returnId]);
+                $pdo->prepare("UPDATE egg_returns SET status = 'rejected', staff_message = ? WHERE id = ?")->execute([$staffMessage, $returnId]);
                 $pdo->commit();
                 json_out(['ok' => true, 'message' => 'Return request rejected.']);
             }
@@ -352,8 +399,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($ret['user_id'])) {
                 throw new RuntimeException('The customer account for this return no longer exists.');
             }
-            $pdo->prepare("UPDATE egg_returns SET status = 'approved', credit_remaining = discount_amount WHERE id = ?")
-                ->execute([$returnId]);
+            $pdo->prepare("UPDATE egg_returns SET status = 'approved', credit_remaining = discount_amount, staff_message = ? WHERE id = ?")
+                ->execute([$staffMessage, $returnId]);
             $pdo->prepare(
                 'INSERT INTO inventory (size_key, tray_size, fresh, near_expiry, unsellable) VALUES (?, 36, 0, 0, ?)
                  ON DUPLICATE KEY UPDATE unsellable = unsellable + VALUES(unsellable)'
@@ -381,12 +428,20 @@ $scope = $_GET['scope'] ?? 'mine';
 if ($scope === 'all') {
     if (!$isStaff) json_out(['error' => 'Staff only.'], 403);
     $orders = load_orders($pdo, null);
-    $returnsSt = $pdo->query("SELECT r.*, u.name AS customer_name, o.receipt_no
+    ensure_return_photo_columns($pdo);
+    // has_image tells the staff page whether a proof photo exists (the file name itself is never sent to the browser).
+    $returnsSt = $pdo->query("SELECT r.id, r.user_id, r.order_id, r.size_key, r.broken_qty, r.discount_amount, r.status, r.created_at,
+                                     CASE WHEN r.image_file IS NULL THEN 0 ELSE 1 END AS has_image,
+                                     u.name AS customer_name, o.receipt_no
                               FROM egg_returns r
                               LEFT JOIN users u ON u.id = r.user_id
                               LEFT JOIN orders o ON o.id = r.order_id
                               WHERE r.status = 'pending' ORDER BY r.id DESC");
     $pendingReturns = $returnsSt->fetchAll();
+    foreach ($pendingReturns as &$pendingReturn) {
+        $pendingReturn['has_image'] = (bool)$pendingReturn['has_image'];
+    }
+    unset($pendingReturn);
 
     $today = date('Y-m-d');
     $weekAgo = date('Y-m-d', strtotime('-6 days'));

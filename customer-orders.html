@@ -17,7 +17,7 @@
         <a class="navbar-brand farm-brand" href="Homepage.html"><img src="images/logo.png" alt=""><span>Joey's Farm</span></a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
           <span class="navbar-toggler-icon"></span>
-        </button>   
+        </button>
         <div class="collapse navbar-collapse" id="main-navigation">
           <ul class="navbar-nav align-items-center">
             <li class="nav-item">
@@ -84,7 +84,7 @@
             <h2 id="order-history-heading" class="card-section-title mb-4">
                 Order History
             </h2>
-            
+
             <div class="table-responsive">
                 <table class="table table-hover order-history-table">
                     <thead>
@@ -170,22 +170,28 @@
                 </div>
                 <div class="modal-body p-4">
                     <input type="hidden" id="return-order-id" name="order_id">
-                    
+
                     <div class="form-group">
-                        <label class="font-weight-bold" for="return-size-key">Egg Size</label>
-                        <select id="return-size-key" name="size_key" class="form-control" required>
-                            <option value="" selected disabled>Select an egg size</option>
-                        </select>
+                        <label class="font-weight-bold">Broken Eggs by Size</label>
+                        <small class="form-text text-muted mb-2">
+                            Tick every egg size that had broken eggs and enter how many.
+                        </small>
+                        <div id="return-items"></div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label class="font-weight-bold" for="return-broken-qty">Number of Broken Eggs</label>
-                        <input type="number" id="return-broken-qty" name="broken_qty" class="form-control" min="1" placeholder="e.g. 2" required>
+                        <label class="font-weight-bold" for="return-photo">
+                            Photo Proof <span class="badge badge-warning">Required</span>
+                        </label>
+                        <input type="file" id="return-photo" name="image" class="form-control-file" accept="image/jpeg,image/png,image/webp" required>
+                        <small class="form-text text-muted">
+                            A clear photo of the broken eggs is required so our staff can check your report. JPG, PNG or WebP; large photos are shrunk automatically.
+                        </small>
                     </div>
-                    
+
                     <div class="alert alert-info small mt-3">
-                        <i class="fas fa-info-circle mr-1"></i> 
-                        Only eggs from this delivered order can be reported. Approved credit will be applied to your next order.
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Only eggs from this delivered order can be reported. Each order can only be reported once, so include every egg size with broken eggs now. Approved credit will be applied to your next order.
                     </div>
                     <div id="return-error-msg" class="alert alert-danger" style="display:none;"></div>
                 </div>
@@ -203,7 +209,7 @@
     <script src="main.js"></script>
     <script src="customer.js?v=2"></script>
     <script src="cart-session.js?v=1"></script>
-    <script src="orders-customer.js?v=10"></script>
+    <script src="orders-customer.js?v=14"></script>
     <script src="floating-cart.js?v=3"></script>
 
 </body>

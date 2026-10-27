@@ -31,6 +31,60 @@
     });
   }
 
+  // Like api(), but sends multipart form data (used for the broken-egg photo).
+  // No Content-Type header here: the browser adds the multipart boundary itself.
+  function apiForm(url, formData) {
+    return fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    }).then(function (r) {
+      if (r.status === 401) {
+        window.location.replace('Index.html?login=1');
+        throw new Error('Not logged in');
+      }
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok) throw new Error(j.error || 'Request failed');
+        return j;
+      });
+    });
+  }
+
+  // Photos from phones are often several MB. Anything big is shrunk in the browser
+  // (longest side 1600 px, JPEG) so it fits the server's 2 MB limit.
+  var MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+  function preparePhoto(file) {
+    return new Promise(function (resolve, reject) {
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+        reject(new Error('Please attach a JPG, PNG or WebP photo.'));
+        return;
+      }
+      if (file.size <= 1.5 * 1024 * 1024) { resolve(file); return; }
+
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(function (blob) {
+          URL.revokeObjectURL(url);
+          if (blob && blob.size <= MAX_UPLOAD_BYTES) resolve(blob);
+          else reject(new Error('That photo is too large. Please choose a smaller one.'));
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error('Could not read that photo. Please choose another one.'));
+      };
+      img.src = url;
+    });
+  }
+
   function el(tag, className, text) {
     var n = document.createElement(tag);
     if (className) n.className = className;
@@ -148,8 +202,7 @@
 
   if (tbody) {
     var statusLabel = { pending: 'Pending', confirmed: 'Confirmed', completed: 'Delivered', cancelled: 'Cancelled' };
-    var returnSize = document.getElementById('return-size-key');
-    var returnQty = document.getElementById('return-broken-qty');
+    var returnItemsBox = document.getElementById('return-items');
     var orderHistoryPage = 1;
     var orderHistoryPageSize = 10;
     var orderHistoryRows = [];
@@ -189,19 +242,43 @@
       }
     });
 
-    function setReturnQuantityLimit() {
-      var option = returnSize.options[returnSize.selectedIndex];
-      var remaining = option ? parseInt(option.dataset.remaining, 10) : 0;
-      if (remaining > 0) {
-        returnQty.max = String(remaining);
-        returnQty.placeholder = '1-' + remaining;
-      } else {
-        returnQty.removeAttribute('max');
-        returnQty.placeholder = 'e.g. 2';
-      }
-    }
+    // One row per egg size in the order: a checkbox plus a quantity box that unlocks when ticked.
+    function buildReturnItems(returnable) {
+      returnItemsBox.innerHTML = '';
+      Object.keys(returnable).forEach(function (key) {
+        var item = returnable[key];
+        var row = el('div', 'd-flex align-items-center mb-2');
 
-    returnSize.addEventListener('change', setReturnQuantityLimit);
+        var wrap = el('div', 'custom-control custom-checkbox flex-grow-1');
+        var check = el('input', 'custom-control-input');
+        check.type = 'checkbox';
+        check.id = 'return-check-' + key;
+        var label = el('label', 'custom-control-label', item.title + ' (' + item.eggs + ' eggs available)');
+        label.htmlFor = check.id;
+        wrap.appendChild(check);
+        wrap.appendChild(label);
+
+        var qty = el('input', 'form-control form-control-sm return-qty ml-3');
+        qty.type = 'number';
+        qty.min = '1';
+        qty.max = String(item.eggs);
+        qty.placeholder = '1-' + item.eggs;
+        qty.style.width = '110px';
+        qty.disabled = true;
+        qty.dataset.size = key;
+        qty.dataset.max = String(item.eggs);
+
+        check.addEventListener('change', function () {
+          qty.disabled = !check.checked;
+          qty.required = check.checked;
+          if (check.checked) qty.focus(); else qty.value = '';
+        });
+
+        row.appendChild(wrap);
+        row.appendChild(qty);
+        returnItemsBox.appendChild(row);
+      });
+    }
 
     var render = function (orders) {
       orderHistoryRows = [];
@@ -238,14 +315,14 @@
         }
         tr.appendChild(detailsCell);
         tr.appendChild(el('td', '', o.receipt));
-        
+
         // Show the paid total and any return credit applied to this order.
         var displayTotal = peso(o.total);
         if (o.discount_total && o.discount_total > 0) {
           displayTotal += ' (Credit: -' + peso(o.discount_total) + ')';
         }
         tr.appendChild(el('td', '', displayTotal));
-        
+
         tr.appendChild(el('td', '', o.delivery_date));
         tr.appendChild(el('td', '', statusLabel[o.status] || o.status));
 
@@ -268,24 +345,31 @@
           returnBtn.type = 'button';
           returnBtn.addEventListener('click', function () {
             $('#return-order-id').val(o.id);
-            while (returnSize.firstChild) returnSize.removeChild(returnSize.firstChild);
-            Object.keys(o.returnable).forEach(function (key) {
-              var item = o.returnable[key];
-              var option = document.createElement('option');
-              option.value = key;
-              option.textContent = item.title + ' (' + item.eggs + ' available)';
-              option.dataset.remaining = String(item.eggs);
-              returnSize.appendChild(option);
-            });
-            returnSize.selectedIndex = 0;
-            setReturnQuantityLimit();
-            $('#return-broken-qty').val('');
+            buildReturnItems(o.returnable);
+            $('#return-photo').val('');
             $('#return-error-msg').hide().text('');
             $('#reportBrokenModal').modal('show');
           });
           action.appendChild(returnBtn);
         } else if (o.status === 'completed') {
-          action.textContent = 'No eggs remaining to report';
+          action.appendChild(el('div', '', o.reported ? 'Already reported' : 'No eggs remaining to report'));
+          var reportStatus = { pending: 'Pending review', approved: 'Approved', rejected: 'Rejected' };
+          var reportClass = { pending: 'text-muted', approved: 'text-success', rejected: 'text-danger' };
+          (o.report_updates || []).forEach(function (u) {
+            var box = el('div', 'small text-left mt-2 mx-auto');
+            box.style.maxWidth = '230px';
+            var line = el('div', 'font-weight-bold ' + (reportClass[u.status] || ''),
+              u.title + ': ' + (reportStatus[u.status] || u.status) +
+              (u.status === 'approved' ? ' (' + peso(u.discount_amount) + ' credit)' : ''));
+            box.appendChild(line);
+            if (u.staff_message) {
+              var note = el('div', 'text-muted font-italic', 'Farm staff: ' + u.staff_message);
+              note.style.whiteSpace = 'pre-wrap';
+              note.style.overflowWrap = 'anywhere';
+              box.appendChild(note);
+            }
+            action.appendChild(box);
+          });
         } else {
           action.textContent = '—';
         }
@@ -321,21 +405,57 @@
       brokenForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        var payload = {
-          action: 'report_return',
-          order_id: parseInt(document.getElementById('return-order-id').value, 10),
-          size_key: document.getElementById('return-size-key').value,
-          broken_qty: parseInt(document.getElementById('return-broken-qty').value, 10)
-        };
+        var errDiv = document.getElementById('return-error-msg');
+        var submitBtn = brokenForm.querySelector('button[type="submit"]');
+        function showError(message) {
+          errDiv.textContent = message || 'Something went wrong.';
+          errDiv.style.display = 'block';
+          submitBtn.disabled = false;
+        }
+        errDiv.style.display = 'none';
 
-        api('orders.php', payload).then(function (res) {
+        // A photo of the broken eggs is required as proof for staff.
+        var photoInput = document.getElementById('return-photo');
+        var photo = photoInput && photoInput.files && photoInput.files[0];
+        if (!photo) {
+          showError('Please attach a photo of the broken eggs as proof.');
+          return;
+        }
+
+        // Collect every ticked egg size
+        var items = [];
+        var invalid = false;
+        returnItemsBox.querySelectorAll('.return-qty').forEach(function (input) {
+          if (input.disabled) return;
+          var n = parseInt(input.value, 10);
+          var max = parseInt(input.dataset.max, 10);
+          if (!n || n < 1 || n > max) { invalid = true; return; }
+          items.push({ size_key: input.dataset.size, broken_qty: n });
+        });
+        if (!items.length) {
+          showError('Please tick at least one egg size and enter how many were broken.');
+          return;
+        }
+        if (invalid) {
+          showError('Each ticked size needs a number between 1 and the eggs available.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        preparePhoto(photo).then(function (blob) {
+          var form = new FormData();
+          form.append('action', 'report_return');
+          form.append('order_id', document.getElementById('return-order-id').value);
+          form.append('items', JSON.stringify(items));
+          form.append('image', blob, blob === photo ? photo.name : 'photo.jpg');
+          return apiForm('orders.php', form);
+        }).then(function (res) {
+          submitBtn.disabled = false;
           alert(res.message);
           $('#reportBrokenModal').modal('hide');
           load();
         }).catch(function (err) {
-          var errDiv = document.getElementById('return-error-msg');
-          errDiv.textContent = err.message || 'Something went wrong.';
-          errDiv.style.display = 'block';
+          showError(err.message);
         });
       });
     }

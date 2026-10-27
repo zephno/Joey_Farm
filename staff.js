@@ -115,7 +115,12 @@ $(document).ready(function () {
         if ($(this).hasClass('order-management-page-prev') && table.page > 1) {
             table.page -= 1;
         } else if ($(this).hasClass('order-management-page-next')) {
-            var pageCount = Math.max(1, Math.ceil(table.rows.length / orderManagementPageSize));
+            // Count only the rows that pass the active date filter, so Next cannot run past the last page.
+            var dateFilter = $('.order-date-filter.active').data('date-filter') || 'all';
+            var visibleRows = table.rows.filter(function (row) {
+                return matchesOrderDate(row.attr('data-created-at'), status === 'returns' ? 'all' : dateFilter);
+            });
+            var pageCount = Math.max(1, Math.ceil(visibleRows.length / orderManagementPageSize));
             if (table.page < pageCount) table.page += 1;
         }
         applyOrderFilters();
@@ -304,7 +309,7 @@ $(document).ready(function () {
         table.page = 1;
         if (!returns.length) {
             table.rows.push($('<tr>').append(
-                $('<td colspan="7">').addClass('text-center text-muted').text('No pending customer return requests.')
+                $('<td colspan="8">').addClass('text-center text-muted').text('No pending customer return requests.')
             ));
             renderOrderManagementTable('returns', 'all');
             return;
@@ -316,6 +321,19 @@ $(document).ready(function () {
             $row.append($('<td>').text(request.receipt_no || 'Order #' + request.order_id));
             $row.append($('<td>').text(request.size_key));
             $row.append($('<td>').text(request.broken_qty));
+
+            // The proof photo the customer attached (only staff can open it, see return_image.php)
+            var $photoCell = $('<td>');
+            if (request.has_image) {
+                var photoSrc = 'return_image.php?id=' + encodeURIComponent(request.id);
+                $photoCell.append($('<a target="_blank" rel="noopener" title="Open the photo full size">').attr('href', photoSrc).append(
+                    $('<img class="rounded border" style="height: 56px; width: 56px; object-fit: cover;" alt="Photo of the broken eggs">').attr('src', photoSrc)
+                ));
+            } else {
+                $photoCell.addClass('text-muted small').text('No photo (sent before photos were required)');
+            }
+            $row.append($photoCell);
+
             $row.append($('<td>').text(peso(request.discount_amount)));
             $row.append($('<td>').text(request.created_at));
 
@@ -475,20 +493,46 @@ $(document).ready(function () {
         }).catch(showError);
     });
 
+    var pendingReturnDecision = null;
+
     $(document).on('click', '.btn-approve-return, .btn-reject-return', function () {
-        var $button = $(this);
-        var approve = $button.hasClass('btn-approve-return');
-        var returnId = parseInt($button.attr('data-return-id'), 10);
-        if (approve && !window.confirm('Approve this return and add its credit to the customer\'s next order?')) return;
-        if (!approve && !window.confirm('Reject this customer return request?')) return;
+        var approve = $(this).hasClass('btn-approve-return');
+        pendingReturnDecision = { id: parseInt($(this).attr('data-return-id'), 10), approve: approve };
+
+        $('#return-decision-title').text(approve ? 'Approve return request' : 'Reject return request');
+        $('#return-decision-help').text(approve
+            ? "Approving adds this request's credit to the customer's next order, for the same egg size."
+            : 'Rejecting means no credit is given. This order cannot be reported again.');
+        $('#return-decision-message').val('');
+        $('#return-decision-error').prop('hidden', true).text('');
+        $('#return-decision-confirm')
+            .removeClass('btn-success btn-danger')
+            .addClass(approve ? 'btn-success' : 'btn-danger')
+            .text(approve ? 'Approve' : 'Reject')
+            .prop('disabled', false);
+        $('#returnDecisionModal').modal('show');
+    });
+
+    $('#return-decision-confirm').on('click', function () {
+        if (!pendingReturnDecision) return;
+        var decision = pendingReturnDecision;
+        var $button = $(this).prop('disabled', true);
 
         api('orders.php', {
-            action: approve ? 'approve_return' : 'reject_return',
-            return_id: returnId
+            action: decision.approve ? 'approve_return' : 'reject_return',
+            return_id: decision.id,
+            message: $('#return-decision-message').val().trim()
         }).then(function (res) {
+            pendingReturnDecision = null;
+            $('#returnDecisionModal').modal('hide');
             alert(res.message);
-            return Promise.all([refreshOrders(), approve ? loadInventory() : Promise.resolve()]);
-        }).catch(showError);
+            return Promise.all([refreshOrders(), decision.approve ? loadInventory() : Promise.resolve()]);
+        }).catch(function (err) {
+            $button.prop('disabled', false);
+            if (err && err.message !== 'Not allowed') {
+                $('#return-decision-error').prop('hidden', false).text(err.message || 'Something went wrong.');
+            }
+        });
     });
 
     $(document).on('change', '.remark-field', function () {
