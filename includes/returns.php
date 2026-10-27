@@ -27,6 +27,22 @@ function ensure_return_message_column(PDO $pdo): void
     }
 }
 
+/** Replacement orders: adds the 'replacement' status and orders.return_id (done once, automatically). */
+function ensure_replacement_schema(PDO $pdo): void
+{
+    try {
+        $pdo->query('SELECT return_id FROM orders LIMIT 1');
+    } catch (Throwable $e) {
+        try { $pdo->exec('ALTER TABLE orders ADD COLUMN return_id INT UNSIGNED NULL'); } catch (Throwable $e2) { /* ignore */ }
+    }
+    try {
+        $col = $pdo->query("SHOW COLUMNS FROM orders LIKE 'status'")->fetch();
+        if ($col && stripos((string)$col['Type'], 'replacement') === false) {
+            $pdo->exec("ALTER TABLE orders MODIFY status ENUM('pending','confirmed','replacement','completed','cancelled') NOT NULL DEFAULT 'pending'");
+        }
+    } catch (Throwable $e) { /* ignore */ }
+}
+
 /** Checks the uploaded proof photo and saves it. Returns [stored file name, mime type]. */
 function store_return_photo($file): array
 {

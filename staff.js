@@ -74,6 +74,7 @@ $(document).ready(function () {
     var orderManagementTables = {
         pending: { table: '#pending-orders-table tbody', pagination: '#pending-orders-pagination', rows: [], page: 1 },
         confirmed: { table: '#confirmed-orders-table tbody', pagination: '#confirmed-orders-pagination', rows: [], page: 1 },
+        replacement: { table: '#replacement-orders-table tbody', pagination: '#replacement-orders-pagination', rows: [], page: 1 },
         completed: { table: '#completed-orders-table tbody', pagination: '#completed-orders-pagination', rows: [], page: 1 },
         cancelled: { table: '#cancelled-orders-table tbody', pagination: '#cancelled-orders-pagination', rows: [], page: 1 },
         returns: { table: '#return-requests-table tbody', pagination: '#returns-orders-pagination', rows: [], page: 1 }
@@ -157,8 +158,11 @@ $(document).ready(function () {
             order.detail_items.forEach(function (item) {
                 var $item = $('<div>').addClass('order-detail-item');
                 $item.append($('<strong>').addClass('order-detail-product').text(item.title));
+                var loose = Number(item.tray_size) === 1;
                 $item.append($('<span>').addClass('order-detail-quantity')
-                    .text(item.qty + (Number(item.qty) === 1 ? ' tray' : ' trays') + ' × ' + item.tray_size + ' eggs'));
+                    .text(loose
+                        ? item.qty + (Number(item.qty) === 1 ? ' loose egg' : ' loose eggs') + ' (replacement)'
+                        : item.qty + (Number(item.qty) === 1 ? ' tray' : ' trays') + ' × ' + item.tray_size + ' eggs'));
                 $item.append($('<span>').addClass('order-detail-total').text(Number(item.eggs_total).toLocaleString('en-US') + ' eggs total'));
                 $itemList.append($item);
             });
@@ -176,6 +180,7 @@ $(document).ready(function () {
         var map = {
             pending:   ['badge-warning text-dark', 'Pending'],
             confirmed: ['badge-info', 'Confirmed'],
+            replacement: ['badge-primary', 'Replacement'],
             completed: ['badge-success', 'Delivered'],
             cancelled: ['badge-danger', 'Cancelled']
         };
@@ -255,7 +260,7 @@ $(document).ready(function () {
                 $recentAction.append($('<div class="order-action-buttons">')
                     .append(orderActionButton('btn-confirm-order', 'btn-primary', 'Confirm'))
                     .append(cancelBtn()));
-            } else if (order.status === 'confirmed') {
+            } else if (order.status === 'confirmed' || order.status === 'replacement') {
                 $recentAction.append($('<div class="order-action-buttons">')
                     .append(orderActionButton('btn-complete-order', 'btn-success', 'Complete'))
                     .append(cancelBtn()));
@@ -279,6 +284,12 @@ $(document).ready(function () {
                     .append(cancelBtn())));
                 $row.append($('<td>').append(remarkInput(order.remark)));
                 orderManagementTables.confirmed.rows.push($row);
+            } else if (order.status === 'replacement') {
+                $row.append($('<td>').append($('<div class="order-action-buttons">')
+                    .append(orderActionButton('btn-complete-order', 'btn-success', 'Complete'))
+                    .append(cancelBtn())));
+                $row.append($('<td>').append(remarkInput(order.remark)));
+                orderManagementTables.replacement.rows.push($row);
             } else if (order.status === 'completed') {
                 $row.append($('<td>').append(statusBadge('completed')));
                 $row.append($('<td>').append(remarkInput(order.remark)));
@@ -300,6 +311,7 @@ $(document).ready(function () {
             $('#val-daily').text(peso(res.sales.daily));
             $('#val-weekly').text(peso(res.sales.weekly));
             $('#val-monthly').text(peso(res.sales.monthly));
+            $('#val-credit').text(peso(res.credit_outstanding || 0));
         }).catch(showError);
     }
 
@@ -341,6 +353,9 @@ $(document).ready(function () {
             $actions.append($('<button type="button">')
                 .addClass('btn btn-sm btn-success btn-approve-return mr-1')
                 .attr('data-return-id', request.id)
+                .attr('data-broken-qty', request.broken_qty)
+                .attr('data-size', request.size_key)
+                .attr('data-credit', request.discount_amount)
                 .text('Approve'));
             $actions.append($('<button type="button">')
                 .addClass('btn btn-sm btn-outline-danger btn-reject-return')
@@ -496,19 +511,30 @@ $(document).ready(function () {
     var pendingReturnDecision = null;
 
     $(document).on('click', '.btn-approve-return, .btn-reject-return', function () {
-        var approve = $(this).hasClass('btn-approve-return');
-        pendingReturnDecision = { id: parseInt($(this).attr('data-return-id'), 10), approve: approve };
+        var $btn = $(this);
+        var approve = $btn.hasClass('btn-approve-return');
+        pendingReturnDecision = { id: parseInt($btn.attr('data-return-id'), 10), approve: approve };
+
+        var eggs = parseInt($btn.attr('data-broken-qty'), 10) || 0;
+        var size = $btn.attr('data-size') || '';
+        var credit = Number($btn.attr('data-credit')) || 0;
 
         $('#return-decision-title').text(approve ? 'Approve return request' : 'Reject return request');
         $('#return-decision-help').text(approve
-            ? "Approving adds this request's credit to the customer's next order, for the same egg size."
-            : 'Rejecting means no credit is given. This order cannot be reported again.');
+            ? 'Please confirm that the photo shows the damage.'
+            : 'Rejecting means no credit and no replacement. This order cannot be reported again.');
+        $('#return-decision-warning').prop('hidden', !approve).text(approve
+            ? '⚠ Approving will:\n' +
+              '• Reduce stock by ' + eggs.toLocaleString() + ' ' + size + ' eggs to replace the broken eggs (reserved now, deducted when the replacement is delivered).\n' +
+              '• Create a Replacement order with the remark "' + eggs.toLocaleString() + ' eggs will be redelivered".\n' +
+              '• Give the customer ' + peso(credit) + ' credit on their next order for the same egg size.'
+            : '');
         $('#return-decision-message').val('');
         $('#return-decision-error').prop('hidden', true).text('');
         $('#return-decision-confirm')
             .removeClass('btn-success btn-danger')
             .addClass(approve ? 'btn-success' : 'btn-danger')
-            .text(approve ? 'Approve' : 'Reject')
+            .text(approve ? 'Approve & Reduce Stock' : 'Reject')
             .prop('disabled', false);
         $('#returnDecisionModal').modal('show');
     });

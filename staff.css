@@ -101,6 +101,7 @@ body {
 #recent-orders-table,
 #pending-orders-table,
 #confirmed-orders-table,
+#replacement-orders-table,
 #completed-orders-table,
 #cancelled-orders-table {
   table-layout: auto;

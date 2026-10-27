@@ -16,6 +16,7 @@ try {
 }
 
 ensure_return_message_column($pdo);
+ensure_replacement_schema($pdo);
 
 function load_orders(PDO $pdo, ?int $userId): array
 {
@@ -81,7 +82,7 @@ function load_orders(PDO $pdo, ?int $userId): array
         }
         $returnable = [];
         $isReported = isset($reportedOrders[(int)$o['id']]);
-        if ($o['status'] === 'completed' && !$isReported) {
+        if ($o['status'] === 'completed' && !$isReported && empty($o['return_id'])) {
             foreach ($purchasedBySize as $key => $purchased) {
                 $available = $purchased['eggs'] - ($returnedByOrder[(int)$o['id']][$key] ?? 0);
                 if ($available > 0) {
@@ -111,6 +112,7 @@ function load_orders(PDO $pdo, ?int $userId): array
             'remark'        => $o['remark'],
             'created_at'    => $o['created_at'],
             'completed_at'  => $o['completed_at'] ?? null,
+            'return_id'     => isset($o['return_id']) ? (int)$o['return_id'] : null,
             'customer'      => $o['customer_name'],
             'returnable'    => $returnable,
             'reported'      => $isReported,
@@ -255,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
         try {
             if ($isStaff) {
-                $st = $pdo->prepare("UPDATE orders SET status='cancelled' WHERE id=? AND status IN ('pending','confirmed')");
+                $st = $pdo->prepare("UPDATE orders SET status='cancelled' WHERE id=? AND status IN ('pending','confirmed','replacement')");
                 $st->execute([$id]);
             } else {
                 $st = $pdo->prepare("UPDATE orders SET status='cancelled' WHERE id=? AND user_id=? AND status='pending'");
@@ -301,7 +303,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             json_out(['error' => 'Could not submit the return request. Please try again.'], 500);
         }
 
-        json_out(['ok' => true, 'message' => 'Return request submitted. Once approved, ₱' . number_format($discountAmount, 2) . ' credit will apply to your next order, for the same egg sizes you reported.']);
+        json_out(['ok' => true, 'message' => 'Return request submitted. Once approved, the broken eggs will be redelivered and ₱' . number_format($discountAmount, 2) . ' credit will apply to your next order, for the same egg sizes you reported.']);
     }
 
     if (!$isStaff) json_out(['error' => 'Staff only.'], 403);
@@ -344,11 +346,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'complete') {
         $pdo->beginTransaction();
         try {
-            $st = $pdo->prepare("UPDATE orders SET status='completed', completed_at=? WHERE id=? AND status='confirmed'");
+            $st = $pdo->prepare("UPDATE orders SET status='completed', completed_at=? WHERE id=? AND status IN ('confirmed','replacement')");
             $st->execute([date('Y-m-d H:i:s'), $id]);
             if (!$st->rowCount()) {
                 $pdo->rollBack();
-                json_out(['error' => 'Only confirmed orders can be completed.'], 409);
+                json_out(['error' => 'Only confirmed or replacement orders can be completed.'], 409);
             }
 
             $need = $pdo->prepare('SELECT size_key, MAX(title) AS title, SUM(qty * tray_size) AS eggs
@@ -399,15 +401,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($ret['user_id'])) {
                 throw new RuntimeException('The customer account for this return no longer exists.');
             }
+            $brokenQty = (int)$ret['broken_qty'];
+            $sizeKey   = (string)$ret['size_key'];
+
+            // Stock must cover the replacement eggs (lock the row first, same as confirming an order).
+            $pdo->prepare('UPDATE inventory SET fresh = fresh WHERE size_key = ?')->execute([$sizeKey]);
+            $avail = stock_map($pdo)[$sizeKey]['available'] ?? 0;
+            if ($brokenQty > $avail) {
+                $pdo->rollBack();
+                json_out(['error' => 'Cannot approve: only ' . number_format($avail) . ' eggs of this size are available, but '
+                    . number_format($brokenQty) . ' are needed for the replacement. Add stock first, or reject the request.'], 409);
+            }
+
+            // 1) approve + customer credit
             $pdo->prepare("UPDATE egg_returns SET status = 'approved', credit_remaining = discount_amount, staff_message = ? WHERE id = ?")
                 ->execute([$staffMessage, $returnId]);
+            // 2) the broken eggs are logged as a loss
             $pdo->prepare(
                 'INSERT INTO inventory (size_key, tray_size, fresh, near_expiry, unsellable) VALUES (?, 36, 0, 0, ?)
                  ON DUPLICATE KEY UPDATE unsellable = unsellable + VALUES(unsellable)'
-            )->execute([$ret['size_key'], (int)$ret['broken_qty']]);
+            )->execute([$sizeKey, $brokenQty]);
+
+            // 3) replacement order (reserves stock now, deducts it when staff complete the delivery)
+            $origSt = $pdo->prepare('SELECT receipt_no, customer_name, address, contact FROM orders WHERE id = ?');
+            $origSt->execute([(int)$ret['order_id']]);
+            $orig = $origSt->fetch();
+            if (!$orig) {
+                $uSt = $pdo->prepare('SELECT name AS customer_name, address, contact FROM users WHERE id = ?');
+                $uSt->execute([(int)$ret['user_id']]);
+                $orig = ($uSt->fetch() ?: ['customer_name' => '', 'address' => '', 'contact' => '']) + ['receipt_no' => ''];
+            }
+            $titleSt = $pdo->prepare('SELECT title FROM order_items WHERE order_id = ? AND size_key = ? LIMIT 1');
+            $titleSt->execute([(int)$ret['order_id'], $sizeKey]);
+            $title = (string)($titleSt->fetchColumn() ?: $sizeKey);
+
+            $remark = number_format($brokenQty) . ($brokenQty === 1 ? ' egg' : ' eggs') . ' will be redelivered'
+                    . ($orig['receipt_no'] ? ' (replacement for ' . $orig['receipt_no'] . ')' : '');
+            $pdo->prepare('INSERT INTO orders (receipt_no, user_id, customer_name, address, contact, payment, total, discount_total, delivery_date, status, remark, created_at, return_id)
+                           VALUES (?,?,?,?,?,?,0,0,?,?,?,?,?)')
+                ->execute(['TMP-' . bin2hex(random_bytes(6)), (int)$ret['user_id'], $orig['customer_name'], $orig['address'], $orig['contact'],
+                           'Replacement (no charge)', date('Y-m-d', strtotime('+2 days')), 'replacement', $remark,
+                           date('Y-m-d H:i:s'), $returnId]);
+            $repId = (int)$pdo->lastInsertId();
+            $pdo->prepare('UPDATE orders SET receipt_no = ? WHERE id = ?')
+                ->execute(['RPL-' . date('Y') . '-' . str_pad((string)$repId, 3, '0', STR_PAD_LEFT), $repId]);
+            // loose eggs: tray_size 1, qty = number of eggs
+            $pdo->prepare('INSERT INTO order_items (order_id, size_key, title, tray_size, unit_price, qty) VALUES (?,?,?,?,0,?)')
+                ->execute([$repId, $sizeKey, $title, 1, $brokenQty]);
 
             $pdo->commit();
-            json_out(['ok' => true, 'message' => 'Return approved. Credit is available only for the same egg size on a future order.']);
+            json_out(['ok' => true, 'message' => 'Return approved. ' . number_format($brokenQty) . ' eggs are reserved for a replacement delivery '
+                . '(see the Replacement orders), and ₱' . number_format((float)$ret['discount_amount'], 2) . ' credit was added for the customer.']);
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             json_out(['error' => 'Could not process return approval.'], 500);
@@ -454,7 +498,9 @@ if ($scope === 'all') {
         if ($day >= $weekAgo)               $sales['weekly']  += $o['total'];
         if (substr($day, 0, 7) === $month)  $sales['monthly'] += $o['total'];
     }
-    json_out(['orders' => $orders, 'sales' => $sales, 'pending_returns' => $pendingReturns]);
+    // Approved return credit that customers have not used yet (a discount still owed on future orders).
+    $creditOutstanding = (float)$pdo->query("SELECT COALESCE(SUM(credit_remaining), 0) FROM egg_returns WHERE status = 'approved'")->fetchColumn();
+    json_out(['orders' => $orders, 'sales' => $sales, 'pending_returns' => $pendingReturns, 'credit_outstanding' => round($creditOutstanding, 2)]);
 }
 
 $creditSt = $pdo->prepare(

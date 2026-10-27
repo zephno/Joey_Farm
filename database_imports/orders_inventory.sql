@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS orders (
   payment       VARCHAR(100) NOT NULL,
   total         DECIMAL(10,2) NOT NULL DEFAULT 0,
   delivery_date DATE NOT NULL,
-  status        ENUM('pending','confirmed','completed','cancelled') NOT NULL DEFAULT 'pending',
+  status        ENUM('pending','confirmed','replacement','completed','cancelled') NOT NULL DEFAULT 'pending',
   remark        VARCHAR(255) NOT NULL DEFAULT '',
   discount_total DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   created_at    DATETIME NOT NULL,
@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS orders (
 ) ENGINE=InnoDB;
 
 ALTER TABLE orders MODIFY contact VARCHAR(11) NOT NULL;
+ALTER TABLE orders MODIFY status ENUM('pending','confirmed','replacement','completed','cancelled') NOT NULL DEFAULT 'pending';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS return_id INT UNSIGNED NULL;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_total DECIMAL(10,2) NOT NULL DEFAULT 0.00;
 
 CREATE TABLE IF NOT EXISTS order_items (

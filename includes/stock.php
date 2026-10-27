@@ -21,7 +21,7 @@ function stock_map(PDO $pdo): array
     $sql = "SELECT i.size_key, SUM(i.qty * i.tray_size) AS eggs
             FROM order_items i
             JOIN orders o ON o.id = i.order_id
-            WHERE o.status = 'confirmed'
+            WHERE o.status IN ('confirmed', 'replacement')
             GROUP BY i.size_key";
     foreach ($pdo->query($sql)->fetchAll() as $r) {
         if (isset($map[$r['size_key']])) {

@@ -201,7 +201,7 @@
   var tbody = document.querySelector('.order-history-table tbody');
 
   if (tbody) {
-    var statusLabel = { pending: 'Pending', confirmed: 'Confirmed', completed: 'Delivered', cancelled: 'Cancelled' };
+    var statusLabel = { pending: 'Pending', confirmed: 'Confirmed', replacement: 'Replacement', completed: 'Delivered', cancelled: 'Cancelled' };
     var returnItemsBox = document.getElementById('return-items');
     var orderHistoryPage = 1;
     var orderHistoryPageSize = 10;
@@ -306,7 +306,9 @@
               Number(item.eggs_total).toLocaleString('en-US') + ' eggs'));
             itemRow.appendChild(itemHeading);
             itemRow.appendChild(el('span', 'customer-order-quantity',
-              item.qty + (Number(item.qty) === 1 ? ' tray' : ' trays') + ' · ' + item.tray_size + ' eggs per tray'));
+              Number(item.tray_size) === 1
+                ? item.qty + (Number(item.qty) === 1 ? ' loose egg' : ' loose eggs') + ' · replacement'
+                : item.qty + (Number(item.qty) === 1 ? ' tray' : ' trays') + ' · ' + item.tray_size + ' eggs per tray'));
             itemList.appendChild(itemRow);
           });
           detailsCell.appendChild(itemList);
@@ -324,7 +326,9 @@
         tr.appendChild(el('td', '', displayTotal));
 
         tr.appendChild(el('td', '', o.delivery_date));
-        tr.appendChild(el('td', '', statusLabel[o.status] || o.status));
+        var statusCell = el('td', '', statusLabel[o.status] || o.status);
+        if (o.status === 'replacement' && o.remark) statusCell.appendChild(el('div', 'small text-muted', o.remark));
+        tr.appendChild(statusCell);
 
         var action = el('td');
         action.className = 'text-center';
